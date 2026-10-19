@@ -80,3 +80,8 @@ Publication revision: 90/90 local tests passed in 16.39 seconds; wheel and sdist
 rebuilt successfully with MIT metadata via `python -m build --no-isolation`.
 `pmp check` passes. Current tracked-file scan has only the previously reviewed synthetic
 test/report matches. Repository created PUBLIC at https://github.com/stokonn/project-memory-protocol.
+
+Git transport and GitHub API verified published main SHA
+`d11c00422c3f0f44e18f350e8b0899f148d4cdc1`. GitHub recognizes MIT.
+Actions workflow is active; observed initial-run jobs are recorded in READINESS.md.
+Publication/docs-only follow-up commits have not been relabeled with earlier test evidence.

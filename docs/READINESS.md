@@ -23,8 +23,8 @@ Remaining release blockers and limits:
 - Native vendor lifecycle artifacts are based on inspected official docs, not authenticated
   live agent sessions. Codex native install gates to inspected CLI 0.163.0; Claude/OpenCode
   artifacts are experimental/manual opt-in, with no certified runtime version range.
-- Cross-platform CI is configured but has not run. Linux/Python 3.14 is locally verified;
-  macOS/Windows and Python 3.11 execution require real CI evidence.
+- Cross-platform CI has started on GitHub. Exact initial-checkpoint job observations
+  appear below; pending jobs and newer commits are not certified by earlier passes.
 - Owner authorization covers public development publication under MIT. Remote SHA and
   CI observations are recorded below. There is no stable release/tag; version is 1.0.0a1.
 - Snapshots are metadata by default. Only explicit bounded private backup allowlists retain
@@ -41,3 +41,33 @@ Remaining release blockers and limits:
 Safe next actions: verify remote development checkpoint and full CI matrix, then validate
 native adapters in disposable trusted agent sessions. Any failed or unavailable CI jobs
 remain acceptance blockers. Evaluate readiness again before seeking stable publication.
+
+## Public development checkpoint
+
+Explicit owner authorization was exercised: public repository
+https://github.com/stokonn/project-memory-protocol is created and MIT is recognized by GitHub.
+Checkpoint `d11c00422c3f0f44e18f350e8b0899f148d4cdc1` was pushed on main; local Git,
+`git ls-remote origin refs/heads/main`, and the GitHub commit API returned the same SHA.
+Pre-push local validation: 90 tests passed; wheel/sdist build succeeded; pmp check passed.
+No existing work was discarded, and all earlier commits remain in the published history.
+
+Initial Actions run: https://github.com/stokonn/project-memory-protocol/actions/runs/39233284582
+Workflow is active; CI was in progress when first checked. This is not a passing result
+and does not certify Python 3.11/macOS/Windows. Recheck the exact head SHA and every job.
+Final documentation commits trigger additional runs; use `gh run list` to select by SHA.
+No stable tag, GitHub Release, or Goldberg integration has been created.
+
+### Observed initial-checkpoint CI jobs
+
+
+| Job | Status | Conclusion |
+| --- | --- | --- |
+| test (ubuntu-latest, 3.11) | completed | success |
+| test (macos-latest, 3.14) | completed | failure |
+| test (windows-latest, 3.14) | in_progress | pending |
+| test (windows-latest, 3.11) | in_progress | pending |
+| test (ubuntu-latest, 3.14) | completed | success |
+| test (macos-latest, 3.11) | completed | failure |
+
+Run status: in_progress; conclusion: pending.
+These observations apply to `d11c00422c3f0f44e18f350e8b0899f148d4cdc1`, not automatically to subsequent commits.

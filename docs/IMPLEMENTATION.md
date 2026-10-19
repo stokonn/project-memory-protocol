@@ -10,7 +10,8 @@
 - [x] E — Executed disposable Goldberg-style workflow and owner readiness proposal.
 
 These checkmarks cover implemented alpha work and local validation, not stable certification.
-Open gates: native agent runtime verification; Python 3.11/macOS/Windows CI execution;
-remote GitHub checkpoint/CI verification (now owner-authorized under MIT).
+Publication checkpoint is now on public GitHub under owner-approved MIT.
+Open gates: remaining/exact-HEAD CI outcomes and native agent runtime verification.
+See READINESS.md for observed platform jobs; no full PMP 1.0 certification is claimed.
 See READINESS.md for operational limits and VALIDATION.md for executed evidence.
 No stable release/tag or actual Goldberg integration is authorized or performed.
