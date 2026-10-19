@@ -37,7 +37,7 @@ def inspect(project,refresh=False):
             'github_verified':False,'ci':None}
     records,_=history(project)
     for c in records:
-        path=str((project.shared/'checkpoints'/(c['checkpoint_id']+'.json')).relative_to(project.root))
+        path=(project.shared/'checkpoints'/(c['checkpoint_id']+'.json')).relative_to(project.root).as_posix()
         r=git.run(project.root,'show','HEAD:'+path,check=False)
         committed = r.returncode==0 and r.stdout == (project.local/'checkpoints'/(c['checkpoint_id']+'.json')).read_bytes()
         result['checkpoints'].append({'checkpoint_id':c['checkpoint_id'],'state':'COMMITTED' if committed else 'LOCAL'})
@@ -71,7 +71,7 @@ def export(project):
         blobs.append((project.shared/'evidence'/(e['evidence_id']+'.json'),(project.local/'evidence'/(e['evidence_id']+'.json')).read_bytes()))
     from pmp.core.storage import atomic_write
     for path,blob in blobs:
-        relative_path(project.root,str(path.relative_to(project.root)))
+        relative_path(project.root,path.relative_to(project.root).as_posix())
         if scan(blob) or len(blob)>project.config['security']['max_shared_bytes']:
             raise PMPError('Export refused: potential secret or size limit. Inspect private memory locally.')
         if path.exists() and path.read_bytes()!=blob:

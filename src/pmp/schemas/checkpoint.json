@@ -165,6 +165,10 @@
     "handoff_hash": {
       "type": "string",
       "pattern": "^[a-f0-9]{64}$"
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 1
     }
   },
   "required": [
@@ -186,7 +190,8 @@
     "storage_state",
     "recovery",
     "integrity",
-    "handoff_hash"
+    "handoff_hash",
+    "sequence"
   ],
   "additionalProperties": false
 }

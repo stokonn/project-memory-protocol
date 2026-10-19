@@ -68,7 +68,7 @@ def generate(project, *, shared=False):
         if scan(__import__('json').dumps(data).encode()):
             raise PMPError('Handoff contains a potential secret; shared publication refused')
         # Explicit command authorizes replacement of PMP-generated handoff only.
-        target=relative_path(project.root,str((project.docs/'HANDOFF.md').relative_to(project.root)))
+        target=relative_path(project.root,(project.docs/'HANDOFF.md').relative_to(project.root).as_posix())
         if target.exists() and not target.read_text().startswith('# PMP handoff\n'):
             raise PMPError('Existing HANDOFF.md is not PMP-generated. Preserve or move it explicitly before shared generation.')
         write_json(project.shared/'handoff.json',data)

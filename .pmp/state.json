@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "project_id": "4e82aee9-c7d0-4c1d-a522-d45b2a61048f",
+  "task_id": "pmp-1.0-implementation",
+  "scope_ref": "docs/OWNER_SCOPE.md",
+  "phase": "verifying",
+  "status": "active",
+  "completed": [
+    "Core CLI, contracts, recovery, watcher, guarded GitHub synchronization and synthetic pilot implemented"
+  ],
+  "in_progress": [
+    "Final packaging and exact-source verification"
+  ],
+  "blockers": [
+    "Owner confirmation required for new public repository and license; native agent and cross-platform CI remain unverified"
+  ],
+  "next_actions": [
+    "Review validation and approve repository/license choices before publication"
+  ],
+  "release_authorization": null
+}

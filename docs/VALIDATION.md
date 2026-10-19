@@ -32,3 +32,24 @@ fixture to use external private state, then reran successfully.
 
 Windows process liveness uses a read-only query API; that platform-specific branch is
 not yet runtime tested. Native adapter and multi-platform CI results are not claimed.
+
+Final implementation suite (after checkpoint orphan ordering and wire-path hardening):
+`python -m pytest -q --junitxml=/tmp/pmp-tests.xml` — **90 passed**, zero failures,
+errors or skips. Preserved JUnit: docs/evidence/pytest.xml. All tests are actually executed.
+
+Packaging verification already executed on the preceding 89-test code revision:
+- `python -m build --no-isolation`: wheel and source distribution built successfully.
+- Fresh `/tmp/pmp-installed-check` venv installed wheel and dependencies using
+  `--no-index --find-links=/tmp/pmp-wheelhouse`; CLI 1.0.0a1 loaded from its installed
+  site-packages, independent of editable source checkout.
+- Full extracted source-distribution tests against installed wheel: **89 passed in
+  16.58 seconds**; JUnit preserved as docs/evidence/installed-pytest.xml.
+- Separate fresh `/tmp/pmp-source-installed-check` installed the tar.gz with normal
+  isolated packaging from the offline wheelhouse; CLI version worked and its actual
+  Goldberg-style demo executed one passing unittest plus interruption/handoff preservation.
+
+Final artifact rebuild/reinstallation is performed after this documentation checkpoint.
+Build outputs are intentionally ignored by Git under dist/; inspect dist/SHA256SUMS for
+actual local artifact digests. Packaging validation does not imply a published package.
+Only Python 3.14 is installed locally. CI matrix is present but unexecuted remotely.
+Native vendor sessions remain untested; no claim of production/stable readiness.

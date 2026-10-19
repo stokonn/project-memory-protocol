@@ -20,8 +20,10 @@ def history(project):
             valid.append(c)
         except PMPError as exc:
             damaged.append({'path':str(path),'error':str(exc)})
-    # Local event range orders checkpoints. Timestamps are only descriptive.
-    valid.sort(key=lambda c:(c['event_range'][1],c['checkpoint_id']))
+    # An independent local checkpoint sequence also orders orphan records after failed event appends.
+    valid.sort(key=lambda c:c['sequence'])
+    if len({c['sequence'] for c in valid})!=len(valid):
+        raise PMPError('Duplicate local checkpoint sequence; inspect competing writers')
     return valid,damaged
 
 def create(project,reason='manual'):
@@ -67,12 +69,12 @@ def create(project,reason='manual'):
     events,tail=Journal(project).read()
     if tail:
         raise PMPError('Repair truncated journal before checkpointing')
-    data={'schema_version':'1.0','checkpoint_id':cp_id,'project_id':project.project_id,
+    data={'schema_version':'1.0','sequence':max((c['sequence'] for c in records),default=0)+1,'checkpoint_id':cp_id,'project_id':project.project_id,
           'worktree_id':project.worktree_id,'task_id':state['task_id'],
           'session_id':__import__('os').environ.get('PMP_SESSION_ID','manual'),'timestamp':now(),'reason':reason,
           'previous':previous,'phase':state['phase'],'status':state['status'],'git':source,
           'evidence':[e['evidence_id'] for e in evidence_list(project)],
-          'event_range':[1 if events else 0,len(events)],'handoff':str(handoff_path.relative_to(project.local)),
+          'event_range':[1 if events else 0,len(events)],'handoff':handoff_path.relative_to(project.local).as_posix(),
           'handoff_hash':handoff_hash,'storage_state':'LOCAL','recovery':{'backup_manifest_hash':manifest_hash,'content_backup':bool(backups),'files':[b['path'] for b in backups],
           'limitations':['Metadata checkpoint is not a full worktree backup. Only explicitly allowlisted files have private content copies.',
                         'Ignored files, secrets, and unsaved editor buffers are not backed up.']}}

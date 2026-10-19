@@ -1,0 +1,39 @@
+{
+  "protocol_version": "1.0",
+  "project_id": "4e82aee9-c7d0-4c1d-a522-d45b2a61048f",
+  "policy": "AGENTS.md",
+  "memory": {
+    "shared": ".pmp",
+    "docs": "docs/ai"
+  },
+  "github": null,
+  "automation": {
+    "heartbeat_seconds": 30,
+    "debounce_seconds": 10,
+    "checkpoint_seconds": 300
+  },
+  "checkpoint": {
+    "backup_allowlist": [],
+    "max_backup_bytes": 1048576
+  },
+  "verification": {
+    "required_checks": [
+      "tests"
+    ],
+    "require_test_count": true
+  },
+  "security": {
+    "share_allowlist": [
+      ".pmp.yml",
+      ".pmp",
+      "docs/ai"
+    ],
+    "max_shared_bytes": 1048576
+  },
+  "adapters": {
+    "generic": "wrapper",
+    "codex": "wrapper",
+    "claude": "wrapper",
+    "opencode": "wrapper"
+  }
+}

@@ -83,7 +83,7 @@ def execute(project,check,command,timeout=3600):
         except PMPError:
             outcome='blocked'
         report_hash=hashlib.sha256(blob).hexdigest() if len(blob)<=4*1024*1024 and blob else None
-        report_ref=str(report.relative_to(project.local))
+        report_ref=report.relative_to(project.local).as_posix()
         # Reports can contain test stdout, source fragments and personal paths.
         # Parse once, retain only hash/count, then remove generated private raw report.
         report.unlink(missing_ok=True)

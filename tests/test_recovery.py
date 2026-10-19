@@ -162,3 +162,27 @@ def test_clock_reversal_does_not_reorder_stream(project,monkeypatch):
     rows,_=j.read()
     assert [e['sequence'] for e in rows]==[1,2]
     assert rows[0]['timestamp']>rows[1]['timestamp']
+
+def test_orphan_checkpoint_after_event_failure_stays_ordered(project,monkeypatch):
+    original=Journal.append
+    def interrupted(self,event_type,payload,**kwargs):
+        if event_type=='checkpoint.created': raise OSError('Simulated crash after record publication')
+        return original(self,event_type,payload,**kwargs)
+    monkeypatch.setattr(Journal,'append',interrupted)
+    with pytest.raises(OSError): create(project,'published before crash')
+    orphan=history(project)[0][-1]
+    monkeypatch.setattr(Journal,'append',original)
+    following=create(project,'resumed')
+    assert following['previous']==orphan['checkpoint_id']
+    assert following['sequence']==orphan['sequence']+1
+    assert history(project)[0][-1]['checkpoint_id']==following['checkpoint_id']
+
+def test_checkpoint_handoff_reference_is_portable(project):
+    from pathlib import PureWindowsPath
+    c=create(project)
+    assert '\\' not in c['handoff'] and not c['handoff'].startswith('/')
+    # Forward-slash wire paths resolve through Windows pathlib without drive/traversal.
+    base=PureWindowsPath('C:/Users/test/pmp')
+    resolved=base/c['handoff']
+    assert resolved.is_relative_to(base)
+    assert resolved.relative_to(base).as_posix()==c['handoff']
