@@ -142,18 +142,29 @@
             "type": "string",
             "minLength": 1
           }
+        },
+        "backup_manifest_hash": {
+          "type": [
+            "string",
+            "null"
+          ]
         }
       },
       "required": [
         "content_backup",
         "files",
-        "limitations"
+        "limitations",
+        "backup_manifest_hash"
       ],
       "additionalProperties": false
     },
     "integrity": {
       "type": "string",
       "minLength": 1
+    },
+    "handoff_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
     }
   },
   "required": [
@@ -174,7 +185,8 @@
     "handoff",
     "storage_state",
     "recovery",
-    "integrity"
+    "integrity",
+    "handoff_hash"
   ],
   "additionalProperties": false
 }

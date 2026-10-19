@@ -7,3 +7,28 @@ could not reach GitHub. Workspace was empty with a read-only .git placeholder;
 authorized git init created the local main branch.
 
 No automated test result is claimed here until the test suite has actually executed.
+
+2026-10-19 intermediate run: `python -m pytest -q --junitxml=/tmp/pmp-tests.xml`
+executed 70 tests, 70 passed in 5.81 seconds. Included killed-session observer/restart,
+fresh-clone shared memory, truncated journal repair and atomic failure fixtures.
+Earlier first run: 67 passed/1 failed due to a mock rejecting keyword arguments; fixed
+mock and reran successfully. No production data or Goldberg checkout used.
+
+`python examples/demo.py --goldberg-style` completed in `/tmp/pmp-demo-0tg0i42m`:
+one real unittest passed, dirty source checkpoint persisted, simulated interrupted lease
+was detected and explicitly released, shared handoff was read without an agent, and
+fixture policy/branch/untracked owner release notes were preserved.
+
+Read-only GitHub recheck outside network sandbox: account stokonn authenticated through
+keyring; planned repository could not be resolved. No public repository was created.
+
+Expanded hardening run: `python -m pytest -q --junitxml=/tmp/pmp-tests.xml`:
+88 passed in 16.40 seconds on Linux/Python 3.14.8. Covers cross-process writer exclusion,
+clock reversal, backup/handoff tampering, report/approval/count release gates, branch
+protection refusal, separate failed CI on confirmed synced SHA, watcher crash isolation,
+and an actual subprocess-based Goldberg-style demo. A new private-store safety check
+initially rejected one fixture that put its private store inside its worktree; corrected
+fixture to use external private state, then reran successfully.
+
+Windows process liveness uses a read-only query API; that platform-specific branch is
+not yet runtime tested. Native adapter and multi-platform CI results are not claimed.

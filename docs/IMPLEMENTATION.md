@@ -5,8 +5,9 @@
   checkpoints, evidence, read-only recovery, handoff, state and CLI.
 - [x] C: single-writer sessions, independent optional watcher, subprocess wrapper,
   reversible adapter artifacts and generic bootstrap.
-- [ ] D: complete hardening, automated tests, wheel/sdist installation and offline demo.
-- [ ] E: disposable Goldberg-style pilot and owner readiness report.
+- [x] D: local automated hardening (88 passing tests); packaging recheck pending.
+- [ ] Packaging: complete hardening, automated tests, wheel/sdist installation and offline demo.
+- [x] E: disposable Goldberg-style pilot executed; owner readiness report pending final packaging checks.
 
 Incomplete until validation is recorded. Native adapters are experimental and have
 not been exercised in authenticated live agent sessions. Public repository existence

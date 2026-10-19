@@ -1,0 +1,8 @@
+include AGENTS.md LICENSE README.md
+recursive-include schemas *.json
+recursive-include spec *.md
+recursive-include docs *.md *.json *.xml
+recursive-include examples *.py *.md *.json
+recursive-include adapters *.md
+recursive-include templates *.md
+recursive-include tests *.py
