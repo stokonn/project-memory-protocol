@@ -6,7 +6,7 @@
     "shared": ".pmp",
     "docs": "docs/ai"
   },
-  "github": null,
+  "github": "stokonn/project-memory-protocol",
   "automation": {
     "heartbeat_seconds": 30,
     "debounce_seconds": 10,

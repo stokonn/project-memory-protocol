@@ -11,6 +11,6 @@
 
 These checkmarks cover implemented alpha work and local validation, not stable certification.
 Open gates: native agent runtime verification; Python 3.11/macOS/Windows CI execution;
-owner approval of repository creation/license; approved GitHub push and observed remote CI.
+remote GitHub checkpoint/CI verification (now owner-authorized under MIT).
 See READINESS.md for operational limits and VALIDATION.md for executed evidence.
 No stable release/tag or actual Goldberg integration is authorized or performed.

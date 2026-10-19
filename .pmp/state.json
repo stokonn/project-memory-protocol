@@ -9,13 +9,13 @@
     "Core CLI, contracts, watcher, recovery, guarded synchronization, 90-test suite and disposable pilot implemented and locally verified"
   ],
   "in_progress": [
-    "Owner review and external compatibility validation"
+    "Authorized public GitHub development checkpoint and CI verification"
   ],
   "blockers": [
-    "Public repository creation and license selection need owner confirmation; native agent sessions and remote cross-platform CI remain unverified"
+    "Native agent sessions and remote cross-platform CI require verification; stable release remains unauthorized"
   ],
   "next_actions": [
-    "Owner reviews readiness report and decides whether to create the public repository and choose a license"
+    "Verify exact remote SHA and CI, record limitations, then resume acceptance checks in a later session"
   ],
   "release_authorization": null
 }

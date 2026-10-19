@@ -65,3 +65,18 @@ verified and tests_executed=90. Later documentation/memory commits invalidate ap
 to their newer Git HEAD; final exact-HEAD evidence is rerun and retained privately.
 Injected low-disk/write failures are fixtures, not physical disk-exhaustion experiments.
 Process deaths are real disposable subprocess kills; no reboot/power-loss claim is made.
+
+## Owner-authorized publication preflight
+
+Owner approved public repository creation, MIT, development push and CI verification.
+Clean preflight HEAD: e7be1533132307e80091c25a929db360c0162c02. All 88 historical Git
+blobs were scanned with PMP's secret patterns; findings were reviewed and classified
+as synthetic secret-detector fixtures (also echoed by JUnit parameter names). No real
+credential matches were found. Private XDG recovery, .venv and build outputs remain
+untracked/ignored. No history rewrite, cleanup, Goldberg operation or stable release.
+Pattern scanning is incomplete and is not a guarantee that every secret format is detected.
+
+Publication revision: 90/90 local tests passed in 16.39 seconds; wheel and sdist
+rebuilt successfully with MIT metadata via `python -m build --no-isolation`.
+`pmp check` passes. Current tracked-file scan has only the previously reviewed synthetic
+test/report matches. Repository created PUBLIC at https://github.com/stokonn/project-memory-protocol.

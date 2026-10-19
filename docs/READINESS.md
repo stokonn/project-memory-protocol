@@ -1,10 +1,10 @@
 # Owner readiness report
 
 PMP is a functioning development alpha, **not ready for PMP 1.0.0 stable publication**.
-The intended standalone repository is stokonn/project-memory-protocol. It was not
-resolvable through the authenticated owner's GitHub account at inspection time.
-No public repo, license selection, stable tag, release, remote push, or real Goldberg
-integration has been performed.
+The owner explicitly authorized the public repository stokonn/project-memory-protocol,
+MIT licensing, development pushes, and CI verification. MIT is applied locally.
+Publication observations are recorded below after verifying GitHub. No stable tag,
+release or real Goldberg integration is authorized or performed.
 
 Implemented: strict protocol/config/state/event/checkpoint/evidence/handoff contracts;
 Python packaging and CLI; source identity; local durable journal and checkpoint chains;
@@ -25,8 +25,8 @@ Remaining release blockers and limits:
   artifacts are experimental/manual opt-in, with no certified runtime version range.
 - Cross-platform CI is configured but has not run. Linux/Python 3.14 is locally verified;
   macOS/Windows and Python 3.11 execution require real CI evidence.
-- Public repository creation, license selection, authorized push and GitHub CI remain pending.
-  There is no release identity/tag; software version is 1.0.0a1.
+- Owner authorization covers public development publication under MIT. Remote SHA and
+  CI observations are recorded below. There is no stable release/tag; version is 1.0.0a1.
 - Snapshots are metadata by default. Only explicit bounded private backup allowlists retain
   file bytes. No automatic restore or recovery of unpersisted/unsaved state.
 - Source identity excludes ignored/external inputs and PMP memory/config; submodules are
@@ -38,7 +38,6 @@ Remaining release blockers and limits:
   lock break or takeover. Watcher polling can miss transient edits and costs file hashing.
 - Alpha schema evolution is not frozen; no automated compatibility migrator is provided.
 
-Safe next actions: review final files/validation and local commits; explicitly decide public
-repository creation and license (MIT may be proposed); push only after that authorization,
-observe exact remote SHA and full CI matrix, then validate native adapters in disposable
-trusted agent sessions. Evaluate release readiness again before requesting stable publication.
+Safe next actions: verify remote development checkpoint and full CI matrix, then validate
+native adapters in disposable trusted agent sessions. Any failed or unavailable CI jobs
+remain acceptance blockers. Evaluate readiness again before seeking stable publication.

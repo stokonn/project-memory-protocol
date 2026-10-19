@@ -13,3 +13,11 @@ Local development commits are authorized. Public repository creation and license
 require owner confirmation. Stable tag/release requires separate explicit approval.
 Goldberg ~/Projects/Opus must remain untouched; disposable synthetic fixture/proposal only.
 No personal data/device tests, Stage 4/5 work, destructive Git operations or sensitive publication.
+
+## Subsequent explicit owner authorization
+
+The owner approved creating public stokonn/project-memory-protocol if absent, MIT
+licensing, committing/pushing the development checkpoint, remote SHA verification,
+and GitHub Actions checks. Final privacy review and preservation of existing work
+remain required. Stable tags/releases and any Goldberg modification remain prohibited.
+Quota priority: durable remote checkpoint and accurate handoff, no new features.

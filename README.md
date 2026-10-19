@@ -3,7 +3,7 @@
 PMP is a local-first, agent-agnostic development memory CLI for Git projects.
 Python 3.11+. No model API, vendor account, or running service is required.
 **Development alpha (1.0.0a1), not an approved PMP 1.0 stable release.**
-License selection and public repository creation are pending owner approval.
+Licensed under MIT. Public development repository: https://github.com/stokonn/project-memory-protocol.
 
 ```sh
 pipx install .
