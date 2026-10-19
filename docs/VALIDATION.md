@@ -253,3 +253,37 @@ flows of the agent. No stable release/tag was created; Goldberg untouched.
 
 Local suite after the artifact fix and two new regression tests:
 `python -m pytest -q` — **96 passed**, zero skips/failures.
+
+## Live Codex 0.163.0 session — partial, quota-blocked (2026-10-19)
+
+Date: 2026-10-19. Host: Linux (fedora). Agent binary: **codex-cli 0.163.0**
+(exact version the native adapter gates to; `codex doctor` 21 ok/0 warn/0 fail;
+ChatGPT auth active). Disposable Git fixture `/tmp/opencode/pmp-codex-fixture-*`
+with external `PMP_STATE_HOME`; Goldberg and this checkout were not test targets.
+Canonical evidence: docs/evidence/codex-live-2026-10-19/VERIFICATION.md.
+
+Executed and verified: fixture init/task/lease; live single-writer refusals
+(second session start and wrong-identity `session end` both refused, exit 3);
+live hook-receiver refusals (cwd mismatch, >64 KiB payload); project-local
+native install (`.codex/hooks.json` only, re-install refused, no global change);
+the genuine tmux-driven TUI trust flow (folder-trust prompt, per-hook review in
+`/hooks`, all four PMP hooks Trusted/Active — no `--dangerously-bypass-*` flag
+used anywhere); trust persistence (new finding: hash-pinned
+`[hooks.state]` entries in `~/.codex/config.toml`); and manual hook-receiver
+contract checks (correct SessionStart `additionalContext` JSON, ~0.15–0.22 s
+execution, well inside the 1 s SessionEnd timeout here).
+
+**Blocker: the owner's Codex weekly limit was at 1% (resets 24 Oct 2026), so no
+model turn was run.** Zero-token TUI cycles (startup plus explicitly created new
+threads) with a transparent `pmp` logging shim produced **zero hook invocations**
+system-wide, and the shared background app-server daemon's `PATH` contains no
+resolvable `pmp` (it exists only in the project venv). Codex session lifecycle
+hooks are therefore turn/session-bound and, in this environment, would fail to
+resolve `pmp` even if fired. Not certified for Codex: automatic checkpoint
+creation from real Stop/SessionEnd events, wrapper lifecycle around a real Codex
+turn, and hook execution environment portability. `pmp check` valid after all
+steps. No production code changed; Goldberg and stable releases untouched.
+
+Codex native hooks remain **not runtime-certified**. Resume after quota reset
+with the retained fixture (trust records still valid) and
+`pmp launch codex -- exec --sandbox read-only "<minimal task>"`.

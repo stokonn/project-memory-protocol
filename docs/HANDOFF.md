@@ -116,8 +116,39 @@ and the certify/don't-certify boundary are in docs/VALIDATION.md; ADAPTERS.md
 documents the version-dependent plugin API. Suite: 96 passed. Two new regression
 tests pin the artifact shape and inspect report.
 
-Remaining unverified: Codex/Claude live sessions, other OpenCode versions and
+Remaining unverified: Claude live sessions, other OpenCode versions and
 TUI/serve modes, Windows/macOS agent hosts, crash-time hook delivery. Next
-session: inspect exact-SHA CI for the new commit; consider live Codex hook
-session next. Do not weaken lease or lock safety. Goldberg and stable
-tags/releases remain outside authorization.
+session: inspect exact-SHA CI for the new commit; resume the Codex live test
+after the weekly quota reset (see below). Do not weaken lease or lock safety.
+Goldberg and stable tags/releases remain outside authorization.
+
+## Codex live test — partial outcome and exact resumption (2026-10-19)
+
+A live Codex session test was attempted in a disposable fixture
+(`/tmp/opencode/pmp-codex-fixture-1792437534`, private state alongside it;
+both retained for resumption). Verified: fixture init/lease, live writer-lease
+and hook-receiver refusals, project-local native install, and the genuine
+tmux-driven trust flow — all four PMP hooks reviewed and trusted in Codex
+0.163.0's `/hooks` UI without any bypass flag; Codex stores trust hash-pinned
+in `~/.codex/config.toml` `[hooks.state]`. **Blocker: the owner's weekly Codex
+limit was at 1% (resets 11:21 PM local, 24 Oct 2026), so no model turn was
+run** and automatic hook-fired checkpoints could not be observed; zero-token
+TUI cycles additionally showed that session lifecycle hooks are turn-bound and
+that the shared app-server daemon's PATH cannot resolve a venv-local `pmp`.
+Full evidence: docs/evidence/codex-live-2026-10-19/VERIFICATION.md and the new
+Codex section in docs/VALIDATION.md. Suite remains 96 passed; no production
+code changed.
+
+After the quota reset (or with owner approval to spend remaining quota):
+
+```sh
+cd /tmp/opencode/pmp-codex-fixture-1792437534
+export PMP_STATE_HOME=/tmp/opencode/pmp-codex-state-1792437534
+export PATH="$HOME/Projects/project-memory-protocol/.venv/bin:$PATH"
+pmp launch codex -- exec --sandbox read-only "Reply with exactly: PMP-CODEX-OK. Change nothing."
+pmp history && pmp check
+```
+
+Hook-fired checkpoints additionally require `pmp` to be resolvable in the
+executing Codex process environment (the background daemon currently lacks it);
+do not install anything globally without owner approval.

@@ -21,7 +21,9 @@ Official references inspected 2026-10-19:
 Native artifacts are **experimental**. Contract-shaped payloads and preservation
 behavior are tested for all adapters; the OpenCode artifact additionally has a live
 runtime verification on v2.0.32 (wrapper + native snapshot capture, see VALIDATION.md).
-Codex and Claude native hooks remain untested against authenticated live sessions.
+The Codex artifact has a live trust-flow verification on codex-cli 0.163.0 (review,
+trust, persistence) but no verified hook-fired checkpoint; Claude hooks remain untested
+against authenticated live sessions.
 Future API/schema/version changes require reinspection; wrappers remain the fallback.
 
 `pmp adapter install codex --native` creates `.codex/hooks.json` only if absent and gates
@@ -31,6 +33,17 @@ snapshots. Under the PMP wrapper they inherit the session identity. Without a wr
 there is no independent session watcher or automatic lease ownership; a conflicting lease
 blocks writes. Hook-only mode must not be mistaken for automatic concurrency protection.
 Existing hooks.json is preserved; use the wrapper rather than silently merging.
+
+Live-verified on codex-cli 0.163.0 (Linux, 2026-10-19; see VALIDATION.md): the artifact
+passes Codex's per-hook review UI and its commands, events and timeouts match the
+documented contract (SessionEnd/Interrupt timeout 1 s). Codex persists trust hash-pinned
+per hook definition in `~/.codex/config.toml` `[hooks.state]`; changed hooks require
+re-review. Two runtime caveats found: session lifecycle hooks are turn/session-bound
+(new threads alone do not fire them), and in this environment the shared background
+app-server daemon's PATH could not resolve a venv-local `pmp`, so hook execution needs
+`pmp` resolvable in the daemon's environment (no global install was performed to test
+this). Automatic checkpoint creation from real Codex hook events is still unverified;
+the weekly usage limit was at 1% and no model turn was run.
 
 `pmp adapter install claude --native` creates `.pmp-adapters/claude-settings.json` with
 SessionStart/Stop/SessionEnd entries. It never edits `.claude/settings.json`. Review against
