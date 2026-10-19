@@ -128,10 +128,50 @@ Run conclusion: failure, solely due to the Windows jobs. The watcher lifecycle t
 now passes on macOS and Ubuntu, and on Windows the only remaining failure is a
 different test (see below). No stable tag, release or Goldberg operation was performed.
 
-## Remaining Windows blocker (not started; explicitly deferred)
+## Windows fresh-clone CI failure — root cause, fix and verified results
 
-Both Windows jobs now report **1 failed, 87 passed, 4 skipped**:
-`tests/test_sessions_git.py::test_fresh_clone_reads_shared_memory` fails with
-`assert ([])` on both Python 3.11 and 3.14. This is a fresh-clone shared-memory
-read path on Windows, unrelated to the watcher fix. Windows fixes were explicitly
-out of scope for the macOS task and have not been started.
+Commit `3eb799939598652a05575d91f88601161b34fe06` fixed the remaining Windows CI failure
+`tests/test_sessions_git.py::test_fresh_clone_reads_shared_memory`.
+
+Root cause: Git for Windows ships `core.autocrlf=true`, so `git clone` rewrites the
+committed LF-only `.pmp/handoffs/*.json` files to CRLF on checkout. `validate_handoff`
+compared `sha256(raw file bytes)` against `handoff_hash`, recorded at checkpoint
+creation over the original LF bytes; the CRLF-smudged bytes mismatched, so every
+shared checkpoint in a fresh clone was marked damaged and `shared_checkpoints` was
+empty. Linux/macOS runners never rewrite line endings. The sibling test
+`test_export_commit_relationship` passed on Windows because `git show` reads pristine
+blob bytes from the object database, which checkout smudging never touches. All other
+raw hashes in the protocol cover private local files (backups, reports) or in-memory
+blobs; the seal-based `intact()` checks are already EOL-insensitive because they
+re-digest canonical JSON of the parsed content.
+
+Fix (smallest correct): `validate_handoff` accepts the recorded hash over either the
+exact raw bytes (checked first, unchanged behavior) or the CRLF->LF-normalized bytes.
+Line endings carry no protocol meaning for a JSON document that is parsed and
+schema-validated anyway; altered content still fails both hash comparisons, and the
+handoff is still schema-validated after hashing. No schema, protocol, stored-record
+or repository-configuration change; no migration required.
+
+Two regression tests were added. `test_fresh_clone_shared_memory_survives_crlf_checkout`
+clones with `git -c core.autocrlf=true`, deterministically reproducing the Windows
+checkout semantics on any platform; it failed with the exact CI symptom (`assert ([])`)
+on the pre-fix code and passes after. `test_shared_handoff_content_tamper_still_refused`
+forges a completion claim inside a cloned handoff and proves damaged records are still
+refused, guarding against weakening the integrity check. Existing assertions unmodified.
+
+Local: `python -m pytest -q` — **94 passed** (92 prior + 2 new), zero skips/failures.
+Actions run https://github.com/stokonn/project-memory-protocol/actions/runs/39241333216
+for exact SHA `3eb799939598652a05575d91f88601161b34fe06` — all six jobs green:
+
+| Job | Status | Conclusion |
+| --- | --- | --- |
+| test (ubuntu-latest, 3.11) | completed | success |
+| test (ubuntu-latest, 3.14) | completed | success |
+| test (macos-latest, 3.11) | completed | success |
+| test (macos-latest, 3.14) | completed | success |
+| test (windows-latest, 3.11) | completed | success |
+| test (windows-latest, 3.14) | completed | success |
+
+Run conclusion: success. This is the first fully green cross-platform matrix. It
+certifies the alpha test suite on these runner images only; native agent runtime
+verification remains outstanding and no stable release/tag exists.

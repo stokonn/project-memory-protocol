@@ -87,15 +87,18 @@ Goldberg and stable tags/releases remain outside authorization.
 Run status: in_progress; conclusion: pending.
 These observations apply to `d11c00422c3f0f44e18f350e8b0899f148d4cdc1`, not automatically to subsequent commits.
 
-## macOS blocker: resolved at `bd311e3`; remaining Windows blocker
+## CI blockers resolved; full matrix green; next gate is native runtime
 
-macOS `test_watcher_lifecycle_and_launch` was fixed in commit
-`bd311e34a4bc0c0eb2215ebe5a02ff1505f17d89`; see docs/VALIDATION.md for the root cause
-(a transient writer-lock race at watcher startup plus stale `last_error` semantics)
-and the exact-HEAD CI evidence. Actions run
-https://github.com/stokonn/project-memory-protocol/actions/runs/39237978499: Ubuntu
-3.11/3.14 and macOS 3.11/3.14 all succeeded. Remaining blocker (deferred, not started):
-both Windows jobs fail `tests/test_sessions_git.py::test_fresh_clone_reads_shared_memory`
-with 1 failed, 87 passed, 4 skipped each. Next session: fix that Windows fresh-clone
-shared-memory path in a disposable fixture; do not weaken lease or lock safety.
-Goldberg and stable tags/releases remain outside authorization.
+macOS `test_watcher_lifecycle_and_launch` was fixed in
+`bd311e34a4bc0c0eb2215ebe5a02ff1505f17d89` (transient writer-lock race at watcher
+startup plus stale `last_error` semantics). Windows
+`tests/test_sessions_git.py::test_fresh_clone_reads_shared_memory` was fixed in
+`3eb799939598652a05575d91f88601161b34fe06` (core.autocrlf CRLF checkout broke the
+raw handoff byte-hash; verification now also accepts the CRLF-normalized hash while
+refusing altered content). Root causes, evidence and the exact-HEAD CI job tables
+are in docs/VALIDATION.md. Actions run
+https://github.com/stokonn/project-memory-protocol/actions/runs/39241333216 for
+`3eb799939598652a05575d91f88601161b34fe06`: **all six Ubuntu/macOS/Windows jobs on
+3.11 and 3.14 succeeded**. Next session: validate native agent hooks in disposable
+trusted agent sessions; do not weaken lease or lock safety. Goldberg and stable
+tags/releases remain outside authorization.

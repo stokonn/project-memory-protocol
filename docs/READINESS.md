@@ -72,14 +72,15 @@ No stable tag, GitHub Release, or Goldberg integration has been created.
 Run status: in_progress; conclusion: pending.
 These observations apply to `d11c00422c3f0f44e18f350e8b0899f148d4cdc1`, not automatically to subsequent commits.
 
-## macOS blocker: resolved at `bd311e3`
+## CI blockers: resolved; full matrix green at `3eb7999`
 
-The macOS `test_watcher_lifecycle_and_launch` failure was fixed in commit
-`bd311e34a4bc0c0eb2215ebe5a02ff1505f17d89` (root cause, fix and verified results are
-recorded in VALIDATION.md). Actions run
-https://github.com/stokonn/project-memory-protocol/actions/runs/39237978499 for that
-exact SHA: Ubuntu 3.11/3.14 and **macOS 3.11/3.14 all succeeded**; the watcher test
-also now passes on Windows. Run conclusion remains failure solely because both
-Windows jobs fail one different test: `tests/test_sessions_git.py::test_fresh_clone_reads_shared_memory`
-(1 failed, 87 passed, 4 skipped on each). Windows fixes are deferred and not started.
-Recheck jobs by exact SHA; do not infer certification for later commits.
+The macOS watcher failure was fixed in `bd311e34a4bc0c0eb2215ebe5a02ff1505f17d89`
+and the Windows fresh-clone failure in `3eb799939598652a05575d91f88601161b34fe06`;
+root causes, fixes and exact-HEAD evidence are recorded in VALIDATION.md. Actions run
+https://github.com/stokonn/project-memory-protocol/actions/runs/39241333216 for
+`3eb799939598652a05575d91f88601161b34fe06`: **all six Ubuntu/macOS/Windows jobs on
+Python 3.11 and 3.14 succeeded** (run conclusion: success). This is the first fully
+green cross-platform matrix; it certifies the alpha suite on these runner images
+only. Native agent runtime verification remains an open gate. No stable tag or
+release exists. Recheck jobs by exact SHA; do not infer certification for later
+commits.
