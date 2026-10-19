@@ -86,3 +86,17 @@ Goldberg and stable tags/releases remain outside authorization.
 
 Run status: in_progress; conclusion: pending.
 These observations apply to `d11c00422c3f0f44e18f350e8b0899f148d4cdc1`, not automatically to subsequent commits.
+
+## Concrete macOS blocker for the next session
+
+Initial checkpoint job `test (macos-latest, 3.14)` completed with **89 passed, 1 failed**
+in 38.61 seconds. Failure: `tests/test_security_cli.py::test_watcher_lifecycle_and_launch`.
+Watcher metadata reached `stopped`, but retained a `Writer lock exists` last_error,
+violating the test's no-error assertion. The Python 3.11 macOS job also failed; its
+precise traceback has not been separately inspected. Investigate watcher contention
+and diagnostic semantics in disposable fixtures; do not weaken ownership/lock safety
+or relabel the failing result as a pass. Windows jobs were still running at last check.
+
+Documentation checkpoint `5b7cc8c7cfe3b224f68a10d242287c8c44e948df` also triggered run
+https://github.com/stokonn/project-memory-protocol/actions/runs/39233446500
+which was in progress when inspected. Subsequent docs-only commits may trigger more runs.

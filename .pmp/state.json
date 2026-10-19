@@ -9,13 +9,13 @@
     "Core CLI, contracts, watcher, recovery, guarded synchronization, 90-test suite and disposable pilot implemented and locally verified"
   ],
   "in_progress": [
-    "Authorized public GitHub development checkpoint and CI verification"
+    "Public development checkpoint is published; CI failure diagnosis deferred to next session"
   ],
   "blockers": [
-    "Native agent sessions and remote cross-platform CI require verification; stable release remains unauthorized"
+    "macOS CI fails watcher lifecycle assertion after writer-lock contention; Windows CI and native runtime certification remain incomplete"
   ],
   "next_actions": [
-    "Verify exact remote SHA and CI, record limitations, then resume acceptance checks in a later session"
+    "Compare local HEAD with origin/main, inspect exact-SHA Actions jobs, then reproduce macOS watcher lifecycle failure in disposable fixtures without weakening lease safety"
   ],
   "release_authorization": null
 }

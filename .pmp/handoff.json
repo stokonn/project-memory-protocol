@@ -6,11 +6,11 @@
   "phase": "verifying",
   "status": "paused",
   "git": {
-    "head": "e7be1533132307e80091c25a929db360c0162c02",
+    "head": "5b7cc8c7cfe3b224f68a10d242287c8c44e948df",
     "branch": "main",
-    "status": "M .pmp.yml\n M .pmp/state.json\n M LICENSE\n M README.md\n M docs/HANDOFF.md\n M docs/IMPLEMENTATION.md\n M docs/OWNER_SCOPE.md\n M docs/READINESS.md\n M docs/VALIDATION.md\n M pyproject.toml",
+    "status": "M .pmp/state.json\n M docs/HANDOFF.md\n M docs/READINESS.md\n M docs/VALIDATION.md",
     "clean": false,
-    "fingerprint": "3753ba3fd39adb7e3ced235e9235488517e41b0e5e732b70dad2917bc3b9cde7",
+    "fingerprint": "f72d28d167669130cd5292b0f690d339eb1ab3771d5157349ae3a02dbadf4ba6",
     "complete": true
   },
   "checkpoint": "5a6e2ffc-3e90-404f-8da3-23e02be3533a",
@@ -19,10 +19,10 @@
     "Core CLI, contracts, watcher, recovery, guarded synchronization, 90-test suite and disposable pilot implemented and locally verified"
   ],
   "in_progress": [
-    "Authorized public GitHub development checkpoint and CI verification"
+    "Public development checkpoint is published; CI failure diagnosis deferred to next session"
   ],
   "blockers": [
-    "Native agent sessions and remote cross-platform CI require verification; stable release remains unauthorized"
+    "macOS CI fails watcher lifecycle assertion after writer-lock contention; Windows CI and native runtime certification remain incomplete"
   ],
   "verification": [
     {
@@ -43,7 +43,7 @@
     }
   ],
   "next_actions": [
-    "Verify exact remote SHA and CI, record limitations, then resume acceptance checks in a later session"
+    "Compare local HEAD with origin/main, inspect exact-SHA Actions jobs, then reproduce macOS watcher lifecycle failure in disposable fixtures without weakening lease safety"
   ],
   "safety_restrictions": [
     "Read canonical policy: AGENTS.md",
@@ -52,5 +52,5 @@
     "Metadata checkpoints do not back up all dirty source contents.",
     "No automatic release, force push, cleanup, or lease takeover."
   ],
-  "timestamp": "2026-10-19T09:52:11.690569+00:00"
+  "timestamp": "2026-10-19T09:54:57.410818+00:00"
 }

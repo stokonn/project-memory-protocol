@@ -3,8 +3,8 @@
 Task: pmp-1.0-implementation
 Approved scope: docs/OWNER_SCOPE.md
 Phase/status: verifying / paused
-HEAD: e7be1533132307e80091c25a929db360c0162c02
-Source fingerprint: 3753ba3fd39adb7e3ced235e9235488517e41b0e5e732b70dad2917bc3b9cde7
+HEAD: 5b7cc8c7cfe3b224f68a10d242287c8c44e948df
+Source fingerprint: f72d28d167669130cd5292b0f690d339eb1ab3771d5157349ae3a02dbadf4ba6
 Checkpoint: 5a6e2ffc-3e90-404f-8da3-23e02be3533a
 Last applicable verified commit: none
 
@@ -14,15 +14,15 @@ Last applicable verified commit: none
 
 ## In progress (reported)
 
-- Authorized public GitHub development checkpoint and CI verification
+- Public development checkpoint is published; CI failure diagnosis deferred to next session
 
 ## Blockers and uncertainty
 
-- Native agent sessions and remote cross-platform CI require verification; stable release remains unauthorized
+- macOS CI fails watcher lifecycle assertion after writer-lock contention; Windows CI and native runtime certification remain incomplete
 
 ## Next suggested actions
 
-- Verify exact remote SHA and CI, record limitations, then resume acceptance checks in a later session
+- Compare local HEAD with origin/main, inspect exact-SHA Actions jobs, then reproduce macOS watcher lifecycle failure in disposable fixtures without weakening lease safety
 
 ## Safety restrictions
 
