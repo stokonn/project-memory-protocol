@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://project-memory-protocol.invalid/1.0/handoff.json",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "project_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "approved_scope_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "phase": {
+      "enum": [
+        "planning",
+        "approved",
+        "implementing",
+        "verifying",
+        "ready_for_release",
+        "released"
+      ]
+    },
+    "status": {
+      "enum": [
+        "active",
+        "paused",
+        "interrupted",
+        "blocked"
+      ]
+    },
+    "git": {
+      "type": "object",
+      "properties": {
+        "head": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "branch": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "minLength": 0
+        },
+        "clean": {
+          "type": "boolean"
+        },
+        "fingerprint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "complete": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "head",
+        "branch",
+        "status",
+        "clean",
+        "fingerprint",
+        "complete"
+      ],
+      "additionalProperties": false
+    },
+    "checkpoint": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "last_verified_commit": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "completed": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "in_progress": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "verification": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "next_actions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "safety_restrictions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "timestamp": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "schema_version",
+    "project_id",
+    "task_id",
+    "approved_scope_ref",
+    "phase",
+    "status",
+    "git",
+    "checkpoint",
+    "last_verified_commit",
+    "completed",
+    "in_progress",
+    "blockers",
+    "verification",
+    "next_actions",
+    "safety_restrictions",
+    "timestamp"
+  ],
+  "additionalProperties": false
+}

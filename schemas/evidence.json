@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://project-memory-protocol.invalid/1.0/evidence.json",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "evidence_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "project_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "head": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "branch": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "minLength": 0
+        },
+        "clean": {
+          "type": "boolean"
+        },
+        "fingerprint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "complete": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "head",
+        "branch",
+        "status",
+        "clean",
+        "fingerprint",
+        "complete"
+      ],
+      "additionalProperties": false
+    },
+    "check": {
+      "type": "string",
+      "minLength": 1
+    },
+    "command": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "environment": {
+      "type": "object",
+      "properties": {
+        "python": {
+          "type": "string",
+          "minLength": 1
+        },
+        "platform": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "python",
+        "platform"
+      ],
+      "additionalProperties": false
+    },
+    "outcome": {
+      "enum": [
+        "passed",
+        "failed",
+        "skipped",
+        "not_run",
+        "interrupted",
+        "blocked"
+      ]
+    },
+    "credibility": {
+      "enum": [
+        "verified",
+        "reported",
+        "unverified"
+      ]
+    },
+    "exit_code": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "tests_executed": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "report_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "report_hash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "timestamp": {
+      "type": "string",
+      "minLength": 1
+    },
+    "integrity": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "schema_version",
+    "evidence_id",
+    "project_id",
+    "source",
+    "check",
+    "command",
+    "environment",
+    "outcome",
+    "credibility",
+    "exit_code",
+    "tests_executed",
+    "report_ref",
+    "report_hash",
+    "timestamp",
+    "integrity"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://project-memory-protocol.invalid/1.0/config.json",
+  "type": "object",
+  "properties": {
+    "protocol_version": {
+      "const": "1.0"
+    },
+    "project_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "policy": {
+      "type": "string",
+      "minLength": 1
+    },
+    "memory": {
+      "type": "object",
+      "properties": {
+        "shared": {
+          "type": "string",
+          "minLength": 1
+        },
+        "docs": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "shared",
+        "docs"
+      ],
+      "additionalProperties": false
+    },
+    "github": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "automation": {
+      "type": "object",
+      "properties": {
+        "heartbeat_seconds": {
+          "type": "number",
+          "minimum": 0.05
+        },
+        "debounce_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "checkpoint_seconds": {
+          "type": "number",
+          "minimum": 0.05
+        }
+      },
+      "required": [
+        "heartbeat_seconds",
+        "debounce_seconds",
+        "checkpoint_seconds"
+      ],
+      "additionalProperties": false
+    },
+    "checkpoint": {
+      "type": "object",
+      "properties": {
+        "backup_allowlist": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "max_backup_bytes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "backup_allowlist",
+        "max_backup_bytes"
+      ],
+      "additionalProperties": false
+    },
+    "verification": {
+      "type": "object",
+      "properties": {
+        "required_checks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "require_test_count": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "required_checks",
+        "require_test_count"
+      ],
+      "additionalProperties": false
+    },
+    "security": {
+      "type": "object",
+      "properties": {
+        "share_allowlist": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "max_shared_bytes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "share_allowlist",
+        "max_shared_bytes"
+      ],
+      "additionalProperties": false
+    },
+    "adapters": {
+      "type": "object",
+      "properties": {
+        "generic": {
+          "enum": [
+            "wrapper",
+            "disabled"
+          ]
+        },
+        "codex": {
+          "enum": [
+            "wrapper",
+            "disabled"
+          ]
+        },
+        "claude": {
+          "enum": [
+            "wrapper",
+            "disabled"
+          ]
+        },
+        "opencode": {
+          "enum": [
+            "wrapper",
+            "disabled"
+          ]
+        }
+      },
+      "required": [
+        "generic",
+        "codex",
+        "claude",
+        "opencode"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "protocol_version",
+    "project_id",
+    "policy",
+    "memory",
+    "github",
+    "automation",
+    "checkpoint",
+    "verification",
+    "security",
+    "adapters"
+  ],
+  "additionalProperties": false
+}

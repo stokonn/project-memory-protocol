@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://project-memory-protocol.invalid/1.0/checkpoint.json",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "checkpoint_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "project_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "worktree_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "timestamp": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "previous": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "phase": {
+      "enum": [
+        "planning",
+        "approved",
+        "implementing",
+        "verifying",
+        "ready_for_release",
+        "released"
+      ]
+    },
+    "status": {
+      "enum": [
+        "active",
+        "paused",
+        "interrupted",
+        "blocked"
+      ]
+    },
+    "git": {
+      "type": "object",
+      "properties": {
+        "head": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "branch": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "minLength": 0
+        },
+        "clean": {
+          "type": "boolean"
+        },
+        "fingerprint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "complete": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "head",
+        "branch",
+        "status",
+        "clean",
+        "fingerprint",
+        "complete"
+      ],
+      "additionalProperties": false
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "event_range": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "handoff": {
+      "type": "string",
+      "minLength": 1
+    },
+    "storage_state": {
+      "const": "LOCAL"
+    },
+    "recovery": {
+      "type": "object",
+      "properties": {
+        "content_backup": {
+          "type": "boolean"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "content_backup",
+        "files",
+        "limitations"
+      ],
+      "additionalProperties": false
+    },
+    "integrity": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "schema_version",
+    "checkpoint_id",
+    "project_id",
+    "worktree_id",
+    "task_id",
+    "session_id",
+    "timestamp",
+    "reason",
+    "previous",
+    "phase",
+    "status",
+    "git",
+    "evidence",
+    "event_range",
+    "handoff",
+    "storage_state",
+    "recovery",
+    "integrity"
+  ],
+  "additionalProperties": false
+}
