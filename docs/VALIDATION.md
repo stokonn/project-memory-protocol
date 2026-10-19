@@ -175,3 +175,81 @@ for exact SHA `3eb799939598652a05575d91f88601161b34fe06` — all six jobs green:
 Run conclusion: success. This is the first fully green cross-platform matrix. It
 certifies the alpha test suite on these runner images only; native agent runtime
 verification remains outstanding and no stable release/tag exists.
+
+## Live OpenCode v2.0.32 runtime integration — verified results
+
+Date: 2026-10-19. Host: Linux (fedora), Git disposable fixture
+`/tmp/opencode/pmp-fixture-*` with private state in a separate external
+`PMP_STATE_HOME`. Agent binary: **opencode v2.0.32** (inspected via
+`opencode --version` and `pmp adapter inspect opencode`). Actual Goldberg and the
+PMP source checkout were not used as test targets; the PMP checkout only supplied
+the CLI under test.
+
+### Genuine test evidence — all executed, not simulated
+
+1. **Fixture initialization**: fresh `git init` fixture, `pmp init`, `pmp task
+   activate` with a local synthetic scope file, `pmp session start --owner`
+   acquired a real writer lease (session UUID + live PID recorded).
+2. **Manual session lifecycle**: snapshot (sequence 1), private handoff, shared
+   handoff (`handoff --shared`), `session end` all succeeded; `pmp check` valid.
+3. **Wrapper workflow with a real agent session**: `pmp launch opencode -- run
+   --format json "..."` executed a genuine `opencode run` turn (session
+   `ses_eab97250affemG24kyhXt6CZpa`, model reply received, exit 0). The wrapper
+   recorded `session launch` and `session stopped` checkpoints (sequences 2–5,
+   including the first wrapper-arg attempt that failed honestly with exit 1 and
+   its own launch/stop pair). Checkpoint chain `previous` links were contiguous.
+   Note: wrapper args after `--` are appended to the binary name, so the first
+   argument must be an `opencode` subcommand (e.g. `run`); duplicating the
+   binary name fails with the agent's own usage error — PMP propagated it.
+4. **Resume and cleanup**: `pmp resume` and `pmp check` passed in the fixture;
+   `sync --export` exported 10 records; memory-only `sync --commit` created a
+   allowlisted commit; `sync --push` correctly **refused** without a configured
+   GitHub reference (exit 2). Ordinary `git push` to a local bare remote
+   (fixture plumbing, no GitHub) succeeded.
+5. **Fresh independent recovery**: a fresh clone with an empty private state
+   recovered all 5 shared checkpoints with zero damaged records and zero
+   uncertainty; `pmp check` correctly flagged the two untracked-in-clone
+   references (canonical policy, approved scope) as errors rather than guessing.
+6. **Independent agent session recovery**: a brand-new agent session (fresh
+   subagent, no prior conversation) working only from the clone recovered the
+   task ID, phase/status, last checkpoint ID and reason, checkpoint count and
+   integrity, and all five safety restrictions. Honest gaps it reported:
+   private journal event contents, agent/tool identity and the scope/policy
+   documents are not recoverable from shared state alone (by design — private
+   state stays private; scope files are owner files).
+7. **Native plugin — first attempt failed honestly**: the previously shipped
+   artifact (named `export const`, `session.idle`, `$` template) was **rejected
+   by opencode v2.0.32** at load: `Plugin must export a default definition with
+   an id and an effect or setup function`. No snapshot was produced. The public
+   plugins docs page still shows the old shape; the installed binary disagrees.
+8. **Native plugin — corrected shape validated live**: probe sessions
+   established the v2 contract: default export `{ id, setup }`; `setup(ctx)`
+   exposes `ctx.event` whose `subscribe(cb)` returns an **async iterable**;
+   project directory is `ctx.location.directory` (`ctx.directory` is undefined);
+   v2.0.32 `opencode run` mode never emitted `session.idle` in any observed
+   session — the turn boundary is `session.execution.succeeded`. With the
+   corrected artifact, real OpenCode turns produced PMP checkpoints with reason
+   `opencode-session-idle` (sequences 7 and 8, reproduced twice including from
+   the exact artifact now shipped by `adapter install opencode --native`).
+   Detached spawning is required: an attached child is killed at agent exit.
+9. **Cleanup**: manually copied plugin removed manually; `adapter uninstall
+   opencode` removed only its unchanged manifested files; fixture `pmp check`
+   valid afterwards.
+
+### What this does and does not certify
+
+Certified: the PMP generic process wrapper around the real `opencode` binary on
+Linux/opencode v2.0.32, including lease acquisition, launch/stop checkpoints,
+watcher lifecycle, shared export, fresh-clone recovery and independent-agent
+context recovery; and the experimental native OpenCode plugin's snapshot capture
+on that exact version (manual copy into `.opencode/plugins/`, `opencode run
+--standalone` mode).
+
+Not certified: other OpenCode versions (the plugin API is version-dependent and
+the public docs lag the binary); interactive TUI/serve modes; Codex and Claude
+native hooks (no live sessions); Windows/macOS agent hosts; crash-time hook
+delivery (a turn boundary is not a process exit); authentication/permission
+flows of the agent. No stable release/tag was created; Goldberg untouched.
+
+Local suite after the artifact fix and two new regression tests:
+`python -m pytest -q` — **96 passed**, zero skips/failures.

@@ -20,9 +20,10 @@ Goldberg source or a physical device. Real Goldberg rollout still requires separ
 
 Remaining release blockers and limits:
 
-- Native vendor lifecycle artifacts are based on inspected official docs, not authenticated
-  live agent sessions. Codex native install gates to inspected CLI 0.163.0; Claude/OpenCode
-  artifacts are experimental/manual opt-in, with no certified runtime version range.
+- Native vendor lifecycle artifacts: OpenCode is now **live-verified on exactly
+  v2.0.32** (wrapper and native snapshot capture, Linux, 2026-10-19; evidence in
+  VALIDATION.md). Other OpenCode versions, Codex and Claude native hooks remain
+  untested against authenticated live sessions; no wider certified range is claimed.
 - Cross-platform CI has started on GitHub. Exact initial-checkpoint job observations
   appear below; pending jobs and newer commits are not certified by earlier passes.
 - Owner authorization covers public development publication under MIT. Remote SHA and
@@ -38,9 +39,11 @@ Remaining release blockers and limits:
   lock break or takeover. Watcher polling can miss transient edits and costs file hashing.
 - Alpha schema evolution is not frozen; no automated compatibility migrator is provided.
 
-Safe next actions: verify remote development checkpoint and full CI matrix, then validate
-native adapters in disposable trusted agent sessions. Any failed or unavailable CI jobs
-remain acceptance blockers. Evaluate readiness again before seeking stable publication.
+Safe next actions: recheck remote development checkpoint and full CI matrix after
+each push. The OpenCode native adapter gate is now cleared on v2.0.32 (disposable
+trusted sessions, Linux); Codex/Claude live sessions and other OpenCode versions
+remain unverified. Any failed or unavailable CI jobs remain acceptance blockers.
+Evaluate readiness again before seeking stable publication.
 
 ## Public development checkpoint
 
@@ -81,6 +84,8 @@ https://github.com/stokonn/project-memory-protocol/actions/runs/39241333216 for
 `3eb799939598652a05575d91f88601161b34fe06`: **all six Ubuntu/macOS/Windows jobs on
 Python 3.11 and 3.14 succeeded** (run conclusion: success). This is the first fully
 green cross-platform matrix; it certifies the alpha suite on these runner images
-only. Native agent runtime verification remains an open gate. No stable tag or
-release exists. Recheck jobs by exact SHA; do not infer certification for later
-commits.
+only. Actions run https://github.com/stokonn/project-memory-protocol/actions/runs/39242185542
+for exact SHA `78c846f261688c91ec0743cdbbbd999fdbea7832`: **all six jobs green again**
+(run conclusion: success). The native OpenCode runtime gate was subsequently cleared on
+v2.0.32 as recorded in VALIDATION.md. No stable tag or release exists. Recheck jobs by
+exact SHA; do not infer certification for later commits.

@@ -65,6 +65,25 @@ def test_claude_artifact_preserves_settings(project):
     adapters.uninstall(project,'claude')
     assert existing.is_file()
 
+@pytest.mark.skipif(os.name=='nt',reason='Native installation intentionally disabled')
+def test_opencode_artifact_verified_v2_shape(project):
+    # Live-validated against opencode v2.0.32: default export {id, setup},
+    # event subscription via ctx.event.subscribe (async iterable), turn
+    # boundary session.execution.succeeded. No transcript ingestion.
+    result=adapters.install(project,'opencode',native=True)
+    blob=(project.root/'.pmp-adapters/opencode-plugin.js').read_text()
+    assert 'export default' in blob
+    assert 'export const' not in blob
+    assert 'ctx.event.subscribe' in blob
+    assert 'session.execution.succeeded' in blob
+    assert 'transcript' not in blob
+    adapters.uninstall(project,'opencode')
+
+def test_opencode_inspect_reports_verified_native_runtime():
+    info=adapters.inspect('opencode')
+    assert info['native_runtime_tested'] is True
+    assert info['native_runtime_verified_versions']=='v2.0.32'
+
 def test_hook_untrusted_payload_no_authorization(project):
     result=adapters.hook(project,'SessionStart',{'transcript_path':'/no/read','permission_mode':'bypassPermissions'})
     assert 'additionalContext' in result['hookSpecificOutput']

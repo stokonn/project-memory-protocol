@@ -32,9 +32,14 @@ def inspect(name):
         except (OSError,subprocess.TimeoutExpired): pass
     return {'adapter':name,'binary_available':bool(binary),'version':version,'wrapper':True,
             'native_interface_documented':name!='generic',
-            'native_runtime_tested':False,'native_support':'experimental artifacts; review before enabling',
-            'capabilities':['launch','independent-session-watcher','local-checkpoint','handoff'],
-            'limitations':['No transcript ingestion','No implicit approvals','No guarantee of hook execution on crashes']}
+            'native_runtime_tested':name=='opencode',
+            'native_runtime_verified_versions':{'opencode':'v2.0.32'}.get(name),
+            'native_support':'experimental artifacts; review before enabling',
+            'capabilities':['launch','independent-session-snapshot','independent-session-watcher','local-checkpoint','handoff'],
+            'limitations':['No transcript ingestion',
+                           'No implicit approvals',
+                           'No guarantee of hook execution on crashes',
+                           'OpenCode native runtime certified only on v2.0.32; other versions unverified']}
 
 def install(project,name,*,native=False):
     info=inspect(name)
@@ -54,16 +59,41 @@ def install(project,name,*,native=False):
                 event:[{'hooks':[{'type':'command','command':f'pmp hook --event {event}','timeout':10}]}]
                 for event in ['SessionStart','Stop','SessionEnd']}},indent=2).encode()+b'\n'
         elif name=='opencode':
-            # Native API untested locally. This is a review artifact, not an autoloaded plugin.
+            # Review artifact, not autoloaded. Shape verified against opencode v2.0.32:
+            # default export { id, setup }; setup(ctx) subscribes to the event bus with
+            # ctx.event.subscribe(cb), which returns an async iterable; the project
+            # directory is ctx.location.directory. v2.0.32 emits session.execution.succeeded
+            # (not the v1 session.idle) at turn boundaries in `opencode run` mode.
             artifacts['.pmp-adapters/opencode-plugin.js']=b'''// Experimental: review against your installed OpenCode before copying to .opencode/plugins/.
-export const PMPPlugin = async ({ $, directory }) => ({
-  event: async ({ event }) => {
-    if (event.type === "session.idle") {
-      try { await $`pmp --project ${directory} snapshot --reason opencode-session-idle`; }
-      catch { /* Failure isolation: PMP does not block the agent. Inspect pmp doctor. */ }
-    }
-  }
-});
+// Verified against opencode v2.0.32 (default export, ctx.event.subscribe async iterable).
+import { spawn } from "node:child_process";
+
+export default {
+  id: "pmp",
+  setup: async (ctx) => {
+    const directory = ctx?.location?.directory;
+    if (!directory) return {};
+    const sub = ctx.event.subscribe(() => {});
+    void (async () => {
+      try {
+        for await (const e of sub) {
+          if (e && (e.type === "session.idle" || e.type === "session.execution.succeeded")) {
+            try {
+              const child = spawn(
+                "pmp",
+                ["--project", directory, "snapshot", "--reason", "opencode-session-idle"],
+                { stdio: "ignore", detached: true, env: process.env },
+              );
+              child.on("error", () => {});
+              child.unref();
+            } catch { /* Failure isolation: PMP does not block the agent. Inspect pmp doctor. */ }
+          }
+        }
+      } catch { /* Failure isolation: PMP does not block the agent. Inspect pmp doctor. */ }
+    })();
+    return {};
+  },
+};
 '''
         else: raise PMPError('Generic adapter has no native hooks')
     manifest=project.local/'adapters'/(name+'.json')

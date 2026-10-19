@@ -8,9 +8,9 @@ owner instruction recorded in OWNER_SCOPE.md; Goldberg and stable releases remai
 Completed: deterministic CLI, contracts, durable local/private recovery, reviewed shared
 exports, tests and synthetic pilot. Existing owner Goldberg checkout remains untouched.
 
-Next: preserve the authorized public development checkpoint, verify exact remote SHA and
-CI, then address acceptance gaps in a later adequately funded session. Native hooks still
-require runtime certification; no stable readiness claim.
+Next: address remaining acceptance gaps in a later adequately funded session
+(Codex/Claude live hook sessions, other OpenCode versions). The OpenCode native
+runtime gate is cleared on v2.0.32; no stable readiness claim.
 
 Local tests: `.venv/bin/python -m pytest`; packaging: `.venv/bin/python -m build`.
 Demo: `.venv/bin/python examples/demo.py --goldberg-style`.
@@ -19,7 +19,7 @@ Dependencies are installed in `.venv`; offline runtime/test wheels were prepared
 No original conversation is required to inspect/continue this work; approved scope and
 unresolved authorization boundaries are in OWNER_SCOPE.md and READINESS.md.
 
-Final local suite now has 90 passing tests, including a checkpoint that survives failure
+Final local suite now has 96 passing tests, including a checkpoint that survives failure
 of its subsequent creation-event append. Local checkpoint sequence preserves ordering
 without timestamps even for such orphan records. Persisted relative references use
 forward slashes for portability. See docs/FILES.txt for the exact file inventory.
@@ -67,7 +67,8 @@ On Windows activate with `.venv\Scripts\Activate.ps1` in PowerShell and use an i
 Python 3.11+ interpreter. Fresh clones have shared context but no private local backups.
 
 Next agent: inspect exact-SHA CI jobs and downloadable reports; record any failures before
-resuming acceptance work. Native agent hooks still need live disposable-session tests.
+resuming acceptance work. Live disposable-session tests for the OpenCode native hook are
+now complete (see the OpenCode runtime section below); Codex/Claude hooks remain untested.
 Do not treat currently unknown matrix results as certified support. No new features were
 started during publication because the owner's Codex quota was nearly exhausted.
 Goldberg and stable tags/releases remain outside authorization.
@@ -87,7 +88,7 @@ Goldberg and stable tags/releases remain outside authorization.
 Run status: in_progress; conclusion: pending.
 These observations apply to `d11c00422c3f0f44e18f350e8b0899f148d4cdc1`, not automatically to subsequent commits.
 
-## CI blockers resolved; full matrix green; next gate is native runtime
+## CI blockers resolved; full matrix green; OpenCode native runtime cleared
 
 macOS `test_watcher_lifecycle_and_launch` was fixed in
 `bd311e34a4bc0c0eb2215ebe5a02ff1505f17d89` (transient writer-lock race at watcher
@@ -97,8 +98,26 @@ startup plus stale `last_error` semantics). Windows
 raw handoff byte-hash; verification now also accepts the CRLF-normalized hash while
 refusing altered content). Root causes, evidence and the exact-HEAD CI job tables
 are in docs/VALIDATION.md. Actions run
-https://github.com/stokonn/project-memory-protocol/actions/runs/39241333216 for
-`3eb799939598652a05575d91f88601161b34fe06`: **all six Ubuntu/macOS/Windows jobs on
-3.11 and 3.14 succeeded**. Next session: validate native agent hooks in disposable
-trusted agent sessions; do not weaken lease or lock safety. Goldberg and stable
+https://github.com/stokonn/project-memory-protocol/actions/runs/39242185542 for
+`78c846f261688c91ec0743cdbbbd999fdbea7832`: **all six Ubuntu/macOS/Windows jobs on
+3.11 and 3.14 succeeded**.
+
+Live runtime integration was then performed in disposable Git fixtures (never
+Goldberg, never this checkout as test target): `pmp launch opencode` wrapped a
+real `opencode run` session on **opencode v2.0.32** with lease, launch/stop
+checkpoints, watcher lifecycle (final metadata stopped, no errors), shared export,
+fresh-clone recovery of all shared checkpoints and independent-agent context
+recovery. The shipped native plugin artifact turned out incompatible with
+v2.0.32 (rejected at load: needs default export; `session.idle` never fires in
+`run` mode; `ctx.directory` undefined; attached children die at exit). The artifact
+was rebuilt to the empirically verified v2 contract and reproduced snapshot
+checkpoints (reason `opencode-session-idle`) from two live sessions. Full evidence
+and the certify/don't-certify boundary are in docs/VALIDATION.md; ADAPTERS.md
+documents the version-dependent plugin API. Suite: 96 passed. Two new regression
+tests pin the artifact shape and inspect report.
+
+Remaining unverified: Codex/Claude live sessions, other OpenCode versions and
+TUI/serve modes, Windows/macOS agent hosts, crash-time hook delivery. Next
+session: inspect exact-SHA CI for the new commit; consider live Codex hook
+session next. Do not weaken lease or lock safety. Goldberg and stable
 tags/releases remain outside authorization.
