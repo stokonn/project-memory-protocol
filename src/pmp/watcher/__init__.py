@@ -64,6 +64,12 @@ def run(project):
                             break
                 except (PMPError,OSError) as exc:
                     metadata['last_error']=str(exc)
+                else:
+                    # Cooperative writer-lock contention is transient and expected
+                    # (e.g. first heartbeat racing the launch checkpoint). Report
+                    # only the latest iteration outcome; a persistent failure
+                    # re-records every iteration and stays in final metadata.
+                    metadata['last_error']=None
                 metadata['timestamp']=now()
                 write_json(project.local/'watcher.json',metadata)
                 deadline=time.monotonic()+cfg['heartbeat_seconds']

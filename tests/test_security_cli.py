@@ -91,6 +91,46 @@ def test_watcher_lifecycle_and_launch(project):
     assert not damaged and len(checkpoints)>=3
     assert any(c['reason']=='watcher: debounced changes' for c in checkpoints)
 
+def _watcher_fixture(project,monkeypatch):
+    cfg=project.config
+    cfg['automation']={'heartbeat_seconds':.01,'debounce_seconds':.01,'checkpoint_seconds':.01}
+    write_json(project.root/'.pmp.yml',cfg)
+    from pmp.core.session import start as session_start
+    value=session_start(project,'human')
+    monkeypatch.setenv('PMP_SESSION_ID',value['session_id'])
+    import pmp.watcher as w
+    return w
+
+def test_watcher_clears_recovered_transient_writer_contention(project,monkeypatch):
+    # Regression: a one-shot writer-lock contention (first heartbeat racing the
+    # launch checkpoint) must not survive into final stopped metadata.
+    w=_watcher_fixture(project,monkeypatch)
+    real=w.heartbeat; calls={'n':0}
+    def flaky(p):
+        calls['n']+=1
+        if calls['n']==1:
+            raise PMPError(f'Writer lock exists: {p.local}/writer.lock. Inspect with pmp doctor; no automatic takeover.',3)
+        real(p)
+        w.stop(p)
+    monkeypatch.setattr(w,'heartbeat',flaky)
+    w.run(project)
+    meta=read_json(project.local/'watcher.json')
+    assert meta['state']=='stopped' and not meta['last_error']
+
+def test_watcher_retains_persistent_writer_contention_error(project,monkeypatch):
+    # Safety guard for the clearing semantics: a persistent writer-lock failure
+    # must remain reported in final metadata, never suppressed.
+    w=_watcher_fixture(project,monkeypatch)
+    calls={'n':0}
+    def blocked(p):
+        calls['n']+=1
+        if calls['n']>=2: w.stop(p)
+        raise PMPError(f'Writer lock exists: {p.local}/writer.lock. Inspect with pmp doctor; no automatic takeover.',3)
+    monkeypatch.setattr(w,'heartbeat',blocked)
+    w.run(project)
+    meta=read_json(project.local/'watcher.json')
+    assert meta['state']=='stopped' and 'Writer lock exists' in meta['last_error']
+
 @pytest.mark.skipif(os.name=='nt',reason='POSIX kill semantics; Windows lifecycle awaits CI')
 def test_killed_session_and_restart_recovery(project):
     cfg=project.config
