@@ -111,6 +111,41 @@ def test_fresh_clone_reads_shared_memory(project,commit,tmp_path):
     assert check(p2)['valid']
     assert p2.local!=project.local
 
+def _crlf_clone(project,tmp_path,name):
+    # Reproduce Windows core.autocrlf=true checkout semantics on any platform.
+    clone=tmp_path/name
+    subprocess.run(['git','-c','core.autocrlf=true','clone',str(project.root),str(clone)],
+                   check=True,capture_output=True)
+    return clone
+
+def test_fresh_clone_shared_memory_survives_crlf_checkout(project,commit,tmp_path):
+    from pmp.verification import execute
+    commit()
+    execute(project,'tests',[sys.executable,'-c','pass'])
+    create(project); github.export(project); github.publish(project,commit=True)
+    p2=Project(_crlf_clone(project,tmp_path,'crlf'))
+    from pmp.recovery import inspect
+    report=inspect(p2)
+    assert report['shared_checkpoints'] and report['verification']
+    assert not report['damaged_shared_checkpoints']
+
+def test_shared_handoff_content_tamper_still_refused(project,commit,tmp_path):
+    from pmp.verification import execute
+    commit()
+    execute(project,'tests',[sys.executable,'-c','pass'])
+    create(project); github.export(project); github.publish(project,commit=True)
+    clone=_crlf_clone(project,tmp_path,'tampered')
+    checkpoint=json.loads(next((clone/'.pmp'/'checkpoints').glob('*.json')).read_bytes())
+    handoff=clone/'.pmp'/checkpoint['handoff']
+    data=json.loads(handoff.read_bytes())
+    data['completed'].append('Forged completion claim')
+    handoff.write_bytes(json.dumps(data,indent=2).encode()+b'\n')
+    p2=Project(clone)
+    from pmp.recovery import inspect
+    report=inspect(p2)
+    # Endings may be rewritten by transport; altered content must never be accepted.
+    assert not report['shared_checkpoints'] and report['damaged_shared_checkpoints']
+
 def test_github_exact_sha_and_ci_are_separate(project,commit,monkeypatch):
     head=commit(); c=create(project)
     github.export(project); github.publish(project,commit=True)

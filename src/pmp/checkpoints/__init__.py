@@ -103,7 +103,14 @@ def shared_history(project):
 
 def validate_handoff(base,c):
     path=relative_path(base,c['handoff'])
-    if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest()!=c['handoff_hash']:
+    if not path.is_file():
+        raise PMPError('Checkpoint handoff missing or corrupted')
+    blob=path.read_bytes()
+    # Git transport may rewrite line endings on checkout (core.autocrlf on
+    # Windows). Line endings carry no protocol meaning for a JSON document
+    # that is parsed and schema-validated below; altered content must still
+    # fail both the exact and the CRLF-normalized hash comparison.
+    if hashlib.sha256(blob).hexdigest()!=c['handoff_hash'] and hashlib.sha256(blob.replace(b'\r\n',b'\n')).hexdigest()!=c['handoff_hash']:
         raise PMPError('Checkpoint handoff missing or corrupted')
     validate('handoff',read_json(path))
 
