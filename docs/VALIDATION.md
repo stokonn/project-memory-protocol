@@ -86,16 +86,52 @@ Git transport and GitHub API verified published main SHA
 Actions workflow is active; observed initial-run jobs are recorded in READINESS.md.
 Publication/docs-only follow-up commits have not been relabeled with earlier test evidence.
 
-## Concrete macOS blocker for the next session
+## macOS watcher CI failure — root cause, fix and verified results
 
-Initial checkpoint job `test (macos-latest, 3.14)` completed with **89 passed, 1 failed**
-in 38.61 seconds. Failure: `tests/test_security_cli.py::test_watcher_lifecycle_and_launch`.
-Watcher metadata reached `stopped`, but retained a `Writer lock exists` last_error,
-violating the test's no-error assertion. The Python 3.11 macOS job also failed; its
-precise traceback has not been separately inspected. Investigate watcher contention
-and diagnostic semantics in disposable fixtures; do not weaken ownership/lock safety
-or relabel the failing result as a pass. Windows jobs were still running at last check.
+Commit `bd311e34a4bc0c0eb2215ebe5a02ff1505f17d89` fixed the macOS
+`tests/test_security_cli.py::test_watcher_lifecycle_and_launch` failure.
 
-Documentation checkpoint `5b7cc8c7cfe3b224f68a10d242287c8c44e948df` also triggered run
-https://github.com/stokonn/project-memory-protocol/actions/runs/39233446500
-which was in progress when inspected. Subsequent docs-only commits may trigger more runs.
+Root cause (two parts): in `launch()`, the parent acquires `writer.lock` for the
+`session launch` checkpoint immediately after spawning the independent watcher
+subprocess; on macOS the watcher's first `heartbeat()` routinely collided with that
+still-held lock, raising a transient `Writer lock exists` PMPError. The watcher loop
+recorded `last_error` on failure but never cleared it on later successful iterations,
+so one recovered startup contention was permanently baked into final `stopped`
+metadata, violating the test's no-error assertion. The same mechanism affected
+Windows; the earlier Python 3.11 macOS traceback was identical to 3.14.
+
+Fix (smallest correct): the watcher loop's try/except gained an `else` clause setting
+`metadata['last_error']=None` after each successful iteration, so metadata reports the
+latest iteration outcome. Diff: 46 insertions, 0 deletions. No lock, lease, ownership
+or takeover logic was touched; a *persistent* failure re-records every iteration and
+remains in final metadata.
+
+Two deterministic regression tests were added: one-shot contention followed by success
+must not survive into final metadata (fails on the pre-fix code, verified by temporary
+revert), and persistent writer-lock contention must remain reported (safety guard
+against suppressing real errors). Existing assertions were not modified.
+
+Local: `python -m pytest -q` — **92 passed** (90 prior + 2 new), zero skips/failures.
+Actions run https://github.com/stokonn/project-memory-protocol/actions/runs/39237978499
+for exact SHA `bd311e34a4bc0c0eb2215ebe5a02ff1505f17d89`:
+
+| Job | Status | Conclusion |
+| --- | --- | --- |
+| test (ubuntu-latest, 3.11) | completed | success |
+| test (ubuntu-latest, 3.14) | completed | success |
+| test (macos-latest, 3.11) | completed | success |
+| test (macos-latest, 3.14) | completed | success |
+| test (windows-latest, 3.11) | completed | failure |
+| test (windows-latest, 3.14) | completed | failure |
+
+Run conclusion: failure, solely due to the Windows jobs. The watcher lifecycle test
+now passes on macOS and Ubuntu, and on Windows the only remaining failure is a
+different test (see below). No stable tag, release or Goldberg operation was performed.
+
+## Remaining Windows blocker (not started; explicitly deferred)
+
+Both Windows jobs now report **1 failed, 87 passed, 4 skipped**:
+`tests/test_sessions_git.py::test_fresh_clone_reads_shared_memory` fails with
+`assert ([])` on both Python 3.11 and 3.14. This is a fresh-clone shared-memory
+read path on Windows, unrelated to the watcher fix. Windows fixes were explicitly
+out of scope for the macOS task and have not been started.

@@ -87,16 +87,15 @@ Goldberg and stable tags/releases remain outside authorization.
 Run status: in_progress; conclusion: pending.
 These observations apply to `d11c00422c3f0f44e18f350e8b0899f148d4cdc1`, not automatically to subsequent commits.
 
-## Concrete macOS blocker for the next session
+## macOS blocker: resolved at `bd311e3`; remaining Windows blocker
 
-Initial checkpoint job `test (macos-latest, 3.14)` completed with **89 passed, 1 failed**
-in 38.61 seconds. Failure: `tests/test_security_cli.py::test_watcher_lifecycle_and_launch`.
-Watcher metadata reached `stopped`, but retained a `Writer lock exists` last_error,
-violating the test's no-error assertion. The Python 3.11 macOS job also failed; its
-precise traceback has not been separately inspected. Investigate watcher contention
-and diagnostic semantics in disposable fixtures; do not weaken ownership/lock safety
-or relabel the failing result as a pass. Windows jobs were still running at last check.
-
-Documentation checkpoint `5b7cc8c7cfe3b224f68a10d242287c8c44e948df` also triggered run
-https://github.com/stokonn/project-memory-protocol/actions/runs/39233446500
-which was in progress when inspected. Subsequent docs-only commits may trigger more runs.
+macOS `test_watcher_lifecycle_and_launch` was fixed in commit
+`bd311e34a4bc0c0eb2215ebe5a02ff1505f17d89`; see docs/VALIDATION.md for the root cause
+(a transient writer-lock race at watcher startup plus stale `last_error` semantics)
+and the exact-HEAD CI evidence. Actions run
+https://github.com/stokonn/project-memory-protocol/actions/runs/39237978499: Ubuntu
+3.11/3.14 and macOS 3.11/3.14 all succeeded. Remaining blocker (deferred, not started):
+both Windows jobs fail `tests/test_sessions_git.py::test_fresh_clone_reads_shared_memory`
+with 1 failed, 87 passed, 4 skipped each. Next session: fix that Windows fresh-clone
+shared-memory path in a disposable fixture; do not weaken lease or lock safety.
+Goldberg and stable tags/releases remain outside authorization.
