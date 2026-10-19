@@ -1,6 +1,10 @@
 .github/workflows/ci.yml
 .gitignore
 .pmp.yml
+.pmp/checkpoints/d8903c2d-7b11-4d97-bd45-72a30706cc46.json
+.pmp/evidence/1a5aeab9-9bf4-4334-bb1e-612d185e626c.json
+.pmp/handoff.json
+.pmp/handoffs/d8903c2d-7b11-4d97-bd45-72a30706cc46.json
 .pmp/state.json
 AGENTS.md
 LICENSE

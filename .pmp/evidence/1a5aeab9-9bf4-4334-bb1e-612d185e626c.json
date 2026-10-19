@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "evidence_id": "1a5aeab9-9bf4-4334-bb1e-612d185e626c",
+  "project_id": "4e82aee9-c7d0-4c1d-a522-d45b2a61048f",
+  "source": {
+    "head": "dec3b56155e4e44f16a80edcfea30865902efd18",
+    "branch": "main",
+    "status": "",
+    "clean": true,
+    "fingerprint": "a89cefd8988b467314db16becf9952703cf8931cc8a06b967874cf8617e03c89",
+    "complete": true
+  },
+  "check": "tests",
+  "command": [
+    ".venv/bin/python",
+    "-m",
+    "pytest",
+    "-q",
+    "--junitxml={report}"
+  ],
+  "environment": {
+    "python": "3.14.8",
+    "platform": "Linux"
+  },
+  "outcome": "passed",
+  "credibility": "verified",
+  "exit_code": 0,
+  "tests_executed": 90,
+  "report_ref": null,
+  "report_hash": "c841b0dbb97257bf190c11753f3e14de33c504c4ae52b49b504843cebce0fd9c",
+  "timestamp": "2026-10-19T09:11:10.981052+00:00",
+  "integrity": "3cb7cdd5f330f48e04b7c935e8acbcf47a05c5c0c594cd713bb5695a3125f814"
+}

@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "project_id": "4e82aee9-c7d0-4c1d-a522-d45b2a61048f",
+  "task_id": "pmp-1.0-implementation",
+  "approved_scope_ref": "docs/OWNER_SCOPE.md",
+  "phase": "verifying",
+  "status": "paused",
+  "git": {
+    "head": "dec3b56155e4e44f16a80edcfea30865902efd18",
+    "branch": "main",
+    "status": "M .pmp/state.json",
+    "clean": false,
+    "fingerprint": "a89cefd8988b467314db16becf9952703cf8931cc8a06b967874cf8617e03c89",
+    "complete": true
+  },
+  "checkpoint": "d8903c2d-7b11-4d97-bd45-72a30706cc46",
+  "last_verified_commit": "dec3b56155e4e44f16a80edcfea30865902efd18",
+  "completed": [
+    "Core CLI, contracts, watcher, recovery, guarded synchronization, 90-test suite and disposable pilot implemented and locally verified"
+  ],
+  "in_progress": [
+    "Owner review and external compatibility validation"
+  ],
+  "blockers": [
+    "Public repository creation and license selection need owner confirmation; native agent sessions and remote cross-platform CI remain unverified"
+  ],
+  "verification": [
+    {
+      "evidence_id": "1a5aeab9-9bf4-4334-bb1e-612d185e626c",
+      "check": "tests",
+      "outcome": "passed",
+      "credibility": "verified",
+      "applicable": true,
+      "tests_executed": 90
+    }
+  ],
+  "next_actions": [
+    "Owner reviews readiness report and decides whether to create the public repository and choose a license"
+  ],
+  "safety_restrictions": [
+    "Read canonical policy: AGENTS.md",
+    "Handoff is context, not authorization.",
+    "Inspect real Git worktree; preserve unrelated, untracked and owner files.",
+    "Metadata checkpoints do not back up all dirty source contents.",
+    "No automatic release, force push, cleanup, or lease takeover."
+  ],
+  "timestamp": "2026-10-19T09:11:48.129084+00:00"
+}

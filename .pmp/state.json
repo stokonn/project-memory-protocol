@@ -4,18 +4,18 @@
   "task_id": "pmp-1.0-implementation",
   "scope_ref": "docs/OWNER_SCOPE.md",
   "phase": "verifying",
-  "status": "active",
+  "status": "paused",
   "completed": [
-    "Core CLI, contracts, recovery, watcher, guarded GitHub synchronization and synthetic pilot implemented"
+    "Core CLI, contracts, watcher, recovery, guarded synchronization, 90-test suite and disposable pilot implemented and locally verified"
   ],
   "in_progress": [
-    "Final packaging and exact-source verification"
+    "Owner review and external compatibility validation"
   ],
   "blockers": [
-    "Owner confirmation required for new public repository and license; native agent and cross-platform CI remain unverified"
+    "Public repository creation and license selection need owner confirmation; native agent sessions and remote cross-platform CI remain unverified"
   ],
   "next_actions": [
-    "Review validation and approve repository/license choices before publication"
+    "Owner reviews readiness report and decides whether to create the public repository and choose a license"
   ],
   "release_authorization": null
 }

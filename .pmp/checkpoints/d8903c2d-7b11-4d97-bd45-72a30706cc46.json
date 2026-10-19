@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "sequence": 1,
+  "checkpoint_id": "d8903c2d-7b11-4d97-bd45-72a30706cc46",
+  "project_id": "4e82aee9-c7d0-4c1d-a522-d45b2a61048f",
+  "worktree_id": "e7419d7ac8ea9876d0cc6ab1",
+  "task_id": "pmp-1.0-implementation",
+  "session_id": "manual",
+  "timestamp": "2026-10-19T09:11:47.926800+00:00",
+  "reason": "Verified local alpha implementation; owner publication decisions pending",
+  "previous": null,
+  "phase": "verifying",
+  "status": "paused",
+  "git": {
+    "head": "dec3b56155e4e44f16a80edcfea30865902efd18",
+    "branch": "main",
+    "status": "M .pmp/state.json",
+    "clean": false,
+    "fingerprint": "a89cefd8988b467314db16becf9952703cf8931cc8a06b967874cf8617e03c89",
+    "complete": true
+  },
+  "evidence": [
+    "1a5aeab9-9bf4-4334-bb1e-612d185e626c"
+  ],
+  "event_range": [
+    1,
+    4
+  ],
+  "handoff": "handoffs/d8903c2d-7b11-4d97-bd45-72a30706cc46.json",
+  "handoff_hash": "04871d6d0eb5ca9f0db078454642eef77983972e674472df001cf81399a78624",
+  "storage_state": "LOCAL",
+  "recovery": {
+    "backup_manifest_hash": null,
+    "content_backup": false,
+    "files": [],
+    "limitations": [
+      "Metadata checkpoint is not a full worktree backup. Only explicitly allowlisted files have private content copies.",
+      "Ignored files, secrets, and unsaved editor buffers are not backed up."
+    ]
+  },
+  "integrity": "d8ec67d2b6a402876006699f4ef804bb794e5beb7398b62d049e1b4c8b484c94"
+}

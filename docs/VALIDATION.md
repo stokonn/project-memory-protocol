@@ -53,3 +53,15 @@ Build outputs are intentionally ignored by Git under dist/; inspect dist/SHA256S
 actual local artifact digests. Packaging validation does not imply a published package.
 Only Python 3.14 is installed locally. CI matrix is present but unexecuted remotely.
 Native vendor sessions remain untested; no claim of production/stable readiness.
+
+Final rebuilt wheel installation was rerun against the final extracted source-distribution
+tests: **90 passed in 16.73 seconds** (zero skips/failures/errors). The current preserved
+installed-pytest.xml is this final run, superseding the intermediate 89-test artifact.
+PMP self-verification also executed 90 tests in 16.58 seconds against clean source commit
+`dec3b56155e4e44f16a80edcfea30865902efd18`, fingerprint
+`a89cefd8988b467314db16becf9952703cf8931cc8a06b967874cf8617e03c89`.
+Its canonical evidence is exported under .pmp/evidence, with outcome passed, credibility
+verified and tests_executed=90. Later documentation/memory commits invalidate applicability
+to their newer Git HEAD; final exact-HEAD evidence is rerun and retained privately.
+Injected low-disk/write failures are fixtures, not physical disk-exhaustion experiments.
+Process deaths are real disposable subprocess kills; no reboot/power-loss claim is made.
