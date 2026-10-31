@@ -20,6 +20,8 @@ def parser():
     sub.add_parser('adapters',help='List available agent integrations without project initialization')
     sub.add_parser('init',help='Initialize safely; preserve existing files')
     sub.add_parser('status',help='Inspect state and actual worktree')
+    s=sub.add_parser('brief',help='Read-only bounded context for a new agent session')
+    s.add_argument('--limit',type=int,default=3,help='Maximum items per category, 1 to 5 (default: 3)')
     sub.add_parser('check',help='Validate contracts, references and consistency')
     s=sub.add_parser('snapshot',help='Create immutable LOCAL checkpoint; no commit/push')
     s.add_argument('--reason',default='manual')
@@ -85,6 +87,9 @@ def dispatch(a):
         from pmp import adapters
         return adapters.inspect(a.name),0
     p=Project(a.project)
+    if a.command=='brief':
+        from pmp.recovery import brief
+        return brief(p,limit=a.limit),0
     if a.command in ['status','resume']:
         from pmp.recovery import inspect
         if a.command=='resume' and a.record:
