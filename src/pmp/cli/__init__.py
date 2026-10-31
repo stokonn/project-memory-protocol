@@ -17,6 +17,7 @@ def parser():
     p.add_argument('--project',default='.',help='Project directory (default: current directory)')
     p.add_argument('--json',action='store_true',help='Print structured JSON')
     sub=p.add_subparsers(dest='command',required=True)
+    sub.add_parser('adapters',help='List available agent integrations without project initialization')
     sub.add_parser('init',help='Initialize safely; preserve existing files')
     sub.add_parser('status',help='Inspect state and actual worktree')
     sub.add_parser('check',help='Validate contracts, references and consistency')
@@ -74,6 +75,15 @@ def dispatch(a):
     if a.command=='init':
         p,m=initialize(a.project)
         return {'initialized':True,'project_id':p.project_id,'root':str(p.root),'preserved':m},0
+    # Read-only agent discovery must work before a project has been initialized.
+    # Neither command creates .pmp state, a Git repository, or adapter files.
+    if a.command=='adapters':
+        from pmp import adapters
+        return {'adapters':[adapters.inspect(name) for name in adapters.NAMES],
+                'note':'Native artifacts are optional and experimental; review the compatibility guide before enabling.'},0
+    if a.command=='adapter' and a.action=='inspect':
+        from pmp import adapters
+        return adapters.inspect(a.name),0
     p=Project(a.project)
     if a.command in ['status','resume']:
         from pmp.recovery import inspect
