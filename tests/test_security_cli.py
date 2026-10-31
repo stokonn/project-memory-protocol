@@ -46,6 +46,28 @@ def test_adapter_uninstall(project):
     adapters.uninstall(project,'generic')
     assert not (project.root/result['files'][0]).exists()
 
+def test_public_agent_discovery_without_initialized_project(tmp_path,capsys):
+    # Discovery must be safe to run against a fresh directory, including before Git init.
+    root=tmp_path/'fresh-project'; root.mkdir()
+    assert main(['--project',str(root),'adapters'])==0
+    listing=json.loads(capsys.readouterr().out)
+    assert {a['adapter'] for a in listing['adapters']}==set(adapters.NAMES)
+    assert all(a['wrapper'] is True for a in listing['adapters'])
+    assert not (root/'.pmp.yml').exists()
+    assert not (root/'.git').exists()
+    assert not (root/'.pmp').exists()
+
+
+def test_single_agent_inspection_without_init(tmp_path,capsys):
+    root=tmp_path/'empty'; root.mkdir()
+    assert main(['--project',str(root),'adapter','inspect','codex'])==0
+    result=json.loads(capsys.readouterr().out)
+    assert result['adapter']=='codex'
+    assert result['native_runtime_tested'] is False
+    assert result['native_support'].startswith('experimental')
+    assert not (root/'.pmp.yml').exists()
+
+
 def test_unsupported_adapter(project):
     with pytest.raises(PMPError,match='Unsupported'): adapters.inspect('made-up')
 
