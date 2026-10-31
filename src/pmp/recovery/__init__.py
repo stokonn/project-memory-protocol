@@ -49,6 +49,44 @@ def handoff_data(project):
                                   'No automatic release, force push, cleanup, or lease takeover.'], 'timestamp':now()}
     return validate('handoff',value)
 
+def brief(project, *, limit=3):
+    """A read-only, bounded context summary. Never imply owner authorization."""
+    if not 1 <= limit <= 5:
+        raise PMPError('Brief item limit must be between 1 and 5')
+    # Neither handoff_data nor inspect writes state or reconstructs lost source.
+    data=handoff_data(project)
+    report=inspect(project)
+    source=data['git']
+    def bounded(items):
+        return [str(x)[:240] for x in items[:limit]]
+    checks=data['verification']
+    applicable=[e for e in checks if e['applicable'] and e['credibility']=='verified' and e['outcome']=='passed']
+    return {
+        'schema_version':'1.0',
+        'read_only':True,
+        'project_id':project.project_id,
+        'worktree_id':project.worktree_id,
+        'git':{'head':source['head'],'branch':source['branch'],'clean':source['clean'],
+               'complete':source['complete'],'fingerprint':source['fingerprint']},
+        'task':{'id':data['task_id'],'approved_scope_ref':data['approved_scope_ref'],
+                'phase':data['phase'],'status':data['status']},
+        'checkpoint':data['checkpoint'],
+        'reported':{'completed':bounded(data['completed']),
+                    'in_progress':bounded(data['in_progress']),
+                    'blockers':bounded(data['blockers']),
+                    'next_actions':bounded(data['next_actions'])},
+        'counts':{'verification_records':len(checks),'applicable_verified_passes':len(applicable)},
+        'verification':[
+            {'check':e['check'],'tests_executed':e['tests_executed'],'evidence_id':e['evidence_id']}
+            for e in applicable[-limit:]],
+        'uncertainty':bounded(report['uncertainty']),
+        'truncated':any(len(data[k])>limit or any(len(str(x))>240 for x in data[k]) for k in
+                        ('completed','in_progress','blockers','next_actions')) or
+                    len(applicable)>limit or len(report['uncertainty'])>limit,
+        'safety':'Context only: read AGENTS.md and the actual Git diff. Owner authorization and a source backup are never implied.'
+    }
+
+
 def render_handoff(value):
     lines=['# PMP handoff','',f"Task: {value['task_id'] or 'none'}",f"Approved scope: {value['approved_scope_ref'] or 'none'}",
            f"Phase/status: {value['phase']} / {value['status']}",f"HEAD: {value['git']['head'] or 'unborn'}",
