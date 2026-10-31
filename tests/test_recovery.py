@@ -186,3 +186,46 @@ def test_checkpoint_handoff_reference_is_portable(project):
     resolved=base/c['handoff']
     assert resolved.is_relative_to(base)
     assert resolved.relative_to(base).as_posix()==c['handoff']
+
+def test_brief_is_read_only_bounded_and_source_bound(project, commit):
+    from pmp.recovery import brief
+    from pmp.verification import execute
+    from pmp.cli import main
+    import sys
+    head=commit()
+    state=project.state()
+    state['completed']=['done '+str(i) for i in range(8)]
+    state['blockers']=['a'*500]
+    state['next_actions']=['next step']
+    project.save_state(state)
+    # A reported completed item must never be mistaken for verified evidence.
+    before=project.source()
+    result=brief(project,limit=2)
+    assert result['read_only'] is True
+    assert result['reported']['completed']==['done 0','done 1']
+    assert len(result['reported']['blockers'][0])==240
+    assert result['truncated'] is True
+    assert result['counts']['applicable_verified_passes']==0
+    assert result['git']['head']==head
+    assert before==project.source()
+    assert not project.local.exists()  # read-only before first snapshot
+
+    # Evidence is bound to source; editing source invalidates prior passes.
+    evidence=execute(project,'tests',[sys.executable,'-c','pass'])
+    assert brief(project)['counts']['applicable_verified_passes']==1
+    (project.root/'other.py').write_text('updated = True\n')
+    after=brief(project)
+    assert after['counts']['applicable_verified_passes']==0
+    assert after['verification']==[]
+    assert 'Owner authorization' in after['safety']
+    assert main(['--project',str(project.root),'brief','--limit','0'])==2
+
+
+def test_brief_cli_json_and_limit(project, capsys):
+    from pmp.cli import main
+    assert main(['--project',str(project.root),'brief','--limit','1'])==0
+    result=json.loads(capsys.readouterr().out)
+    assert result['read_only'] is True
+    assert result['worktree_id']==project.worktree_id
+    assert result['verification']==[]
+    assert not project.local.exists()
