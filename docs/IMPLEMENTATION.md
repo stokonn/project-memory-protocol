@@ -12,7 +12,7 @@
   wrapper session lifecycle, checkpoints, shared handoff, fresh-clone recovery,
   independent-agent context recovery and native plugin snapshot capture.
 
-These checkmarks cover implemented alpha work and local validation, not stable certification.
+Next development increment (pending CI acceptance): `pmp adapters`, pre-init\n`pmp adapter inspect`, and `pmp brief` (source-aware, bounded, read-only context).\nTests added to guard read-only behavior, output size and evidence invalidation.\nThese changes are not certified until the feature branch passes CI.\n\nThese checkmarks cover implemented alpha work and local validation, not stable certification.
 Publication checkpoint is now on public GitHub under owner-approved MIT.
 Open gates: native runtime certification beyond OpenCode v2.0.32; cross-platform CI is fully green.
 CI for `78c846f261688c91ec0743cdbbbd999fdbea7832`: all six Ubuntu/macOS/Windows
