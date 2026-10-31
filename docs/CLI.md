@@ -13,8 +13,11 @@ reading persisted evidence rather than assuming mixed stdout is a single JSON do
 
 | Command | Behavior |
 | --- | --- |
+| adapters | Inspect all available agent integrations (works before init, read-only) |
+| adapter inspect NAME | Inspect one agent, even before project initialization (read-only) |
 | init | Initialize Git if needed; create missing PMP memory; preserve existing config/docs |
 | status | Read real Git state, task, checkpoint, source, verification and cached sync facts |
+| brief --limit N | Bounded read-only agent context, 1–5 items per category (default 3) |
 | check | Validate schemas, identities, integrity, references and local consistency |
 | snapshot --reason TEXT | Durable LOCAL record, no stage/commit/push |
 | handoff | Write private JSON and Markdown handoff |
@@ -48,7 +51,7 @@ reading persisted evidence rather than assuming mixed stdout is a single JSON do
 | adapter install NAME --native | Explicit experimental native artifacts; see adapter setup |
 | hook --event NAME | Bounded stdin JSON lifecycle receiver; never ingests transcript |
 
-Verification with pytest and measured execution count:
+The `brief` JSON returns branch, exact HEAD, worktree identity, reported status and\nnext actions, applicable verified evidence and uncertainty. Reported completion is\n**not** verification or owner authorization. Text items are clipped to 240 characters;\nthe `truncated` flag indicates omissions. Read the actual Git diff and canonical\npolicy before making changes. This command performs source fingerprint scans and\ncan cost disk I/O on very large repositories; it makes no model API calls.\n\nVerification with pytest and measured execution count:
 
 ```sh
 pmp verify --run tests -- python -m pytest '--junitxml={report}'
