@@ -295,7 +295,7 @@ def test_codex_native_artifact_uses_explicit_project_and_no_bare_pmp(project,mon
     artifact=json.loads((project.root/'.codex/hooks.json').read_text())
     for event in ('SessionStart','Stop','SessionEnd','Interrupt'):
         command=artifact['hooks'][event][0]['hooks'][0]['command']
-        assert command.startswith(\"'\") or command.startswith(sys.executable)
+        assert command.startswith("'") or command.startswith(sys.executable)
         assert ' -m pmp --project ' in command
         assert command.endswith(' hook --event '+event)
         assert command!='pmp hook --event '+event
