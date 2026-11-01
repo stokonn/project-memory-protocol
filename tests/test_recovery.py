@@ -229,3 +229,18 @@ def test_brief_cli_json_and_limit(project, capsys):
     assert result['worktree_id']==project.worktree_id
     assert result['verification']==[]
     assert not project.local.exists()
+
+
+def test_brief_reuses_single_source_fingerprint(project, monkeypatch):
+    from pmp.recovery import brief
+    actual=project.source
+    calls=[]
+    def counted():
+        calls.append(1)
+        return actual()
+    monkeypatch.setattr(project,'source',counted)
+    result=brief(project)
+    assert result['read_only'] is True
+    assert result['git']['complete'] is True
+    # A large tracked project must not be rehashed to evaluate the same evidence.
+    assert len(calls)==1
