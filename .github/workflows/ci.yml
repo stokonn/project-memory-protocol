@@ -19,6 +19,7 @@ jobs:
       - run: python -m pytest --junitxml=pmp-test-results.xml
       - run: python -m build
       - run: python examples/demo.py --goldberg-style
+      - run: python examples/brief_benchmark.py --samples 2 --limit 3
       - uses: actions/upload-artifact@v4
         if: always()
         with:
