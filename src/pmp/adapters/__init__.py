@@ -52,7 +52,13 @@ def native_hook_command(project, event):
     python=Path(sys.executable)
     if not python.is_absolute() or not python.is_file() or not os.access(python,os.X_OK):
         raise PMPError('Cannot locate an executable Python interpreter for native hooks; use the generic wrapper')
-    return (f'{shlex.quote(str(python))} -m pmp '
+    # A Codex app-server daemon may not inherit the launching shell's custom
+    # state directory. Pin the resolved private state root in native artifacts,
+    # otherwise the daemon can silently checkpoint into another store.
+    from pmp.core.config import private_base
+    state=private_base().resolve()
+    return (f'PMP_STATE_HOME={shlex.quote(str(state))} '
+            f'{shlex.quote(str(python))} -m pmp '
             f'--project {shlex.quote(str(project.root))} hook --event {shlex.quote(event)}')
 
 
