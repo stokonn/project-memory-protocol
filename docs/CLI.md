@@ -51,7 +51,11 @@ reading persisted evidence rather than assuming mixed stdout is a single JSON do
 | adapter install NAME --native | Explicit experimental native artifacts; see adapter setup |
 | hook --event NAME | Bounded stdin JSON lifecycle receiver; never ingests transcript |
 
-The `brief` JSON returns branch, exact HEAD, worktree identity, reported status and\nnext actions, applicable verified evidence and uncertainty. Reported completion is\n**not** verification or owner authorization. Text items are clipped to 240 characters;\nthe `truncated` flag indicates omissions. Read the actual Git diff and canonical\npolicy before making changes. This command performs source fingerprint scans and\ncan cost disk I/O on very large repositories; it makes no model API calls.\n\nVerification with pytest and measured execution count:
+The `brief` JSON returns branch, exact HEAD, worktree identity, reported status and\nnext actions, applicable verified evidence and uncertainty. Reported completion is\n**not** verification or owner authorization. Text items are clipped to 240 characters;\nthe `truncated` flag indicates omissions. Read the actual Git diff and canonical\npolicy before making changes. This command performs source fingerprint scans and\ncan cost disk I/O on very large repositories; it makes no model API calls.\n\nUse `python examples/brief_benchmark.py --samples 3` to measure output byte size and
+elapsed time in a synthetic disposable project. It does not call models or establish
+real-world token/credit savings. See [benchmark methodology](BENCHMARK.md).
+
+Verification with pytest and measured execution count:
 
 ```sh
 pmp verify --run tests -- python -m pytest '--junitxml={report}'
