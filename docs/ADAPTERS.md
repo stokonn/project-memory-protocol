@@ -27,8 +27,8 @@ against authenticated live sessions.
 Future API/schema/version changes require reinspection; wrappers remain the fallback.
 
 **Machine-local native command paths:** Codex and Claude hook artifacts now pin the
-interpreter running PMP (`sys.executable`) and the exact Git worktree (`--project`).
-This avoids relying on the vendor daemon's `PATH` or launch working directory.
+interpreter running PMP (`sys.executable`), the exact Git worktree (`--project`) and the local private state root (`PMP_STATE_HOME`).
+This avoids relying on the vendor daemon's `PATH` or launch working directory, nor on its inherited state-directory environment.
 Generated hook commands use shell-quoted POSIX paths and are intended for the
 specific machine where they were created; after a Python environment or workspace
 move, uninstall and reinstall reviewed artifacts. **Do not commit machine-specific
