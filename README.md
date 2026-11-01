@@ -94,7 +94,13 @@ python -m pip install -e . pytest build
 python -m pytest
 python -m build
 python examples/demo.py --goldberg-style
+python examples/brief_benchmark.py --samples 3 --limit 3
 ```
+
+The benchmark creates only a disposable synthetic project and compares JSON output
+bytes and wall-clock time for `pmp status` versus `pmp brief`. It **does not** measure
+billed tokens, real Codex credits or real-agent productivity; see
+[benchmark methodology](docs/BENCHMARK.md).
 
 The demo uses a **disposable synthetic fixture**, never the owner's real Gould source or data.
 
