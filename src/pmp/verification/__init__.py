@@ -29,8 +29,11 @@ def applicable(e,source):
     return (e['source']['complete'] and source['complete'] and
             e['source']['head']==source['head'] and e['source']['fingerprint']==source['fingerprint'])
 
-def summary(project):
-    source=project.source()
+def summary(project, *, source=None):
+    # Reuse a verified in-memory source scan when supplied by a read-only caller.
+    # This avoids hashing large worktrees more than once during recovery/brief.
+    if source is None:
+        source=project.source()
     return [dict(e,applicable=applicable(e,source)) for e in evidence_list(project)]
 
 def junit_count(blob):
