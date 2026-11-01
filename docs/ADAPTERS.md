@@ -26,6 +26,17 @@ trust, persistence) but no verified hook-fired checkpoint; Claude hooks remain u
 against authenticated live sessions.
 Future API/schema/version changes require reinspection; wrappers remain the fallback.
 
+**Machine-local native command paths:** Codex and Claude hook artifacts now pin the
+interpreter running PMP (`sys.executable`) and the exact Git worktree (`--project`).
+This avoids relying on the vendor daemon's `PATH` or launch working directory.
+Generated hook commands use shell-quoted POSIX paths and are intended for the
+specific machine where they were created; after a Python environment or workspace
+move, uninstall and reinstall reviewed artifacts. **Do not commit machine-specific
+native hook commands to a public repository.** Installation never overwrites an
+existing hook artifact or edits global agent settings. This improves invocation
+reliability but does not certify a live model-turn hook, and background daemon
+permissions and timeouts still require runtime testing.
+
 `pmp adapter install codex --native` creates `.codex/hooks.json` only if absent and gates
 to inspected `codex-cli 0.163.0`. Review/trust through Codex `/hooks`; PMP never bypasses
 trust. SessionStart supplies bootstrap context; Stop/SessionEnd/Interrupt request local
@@ -38,11 +49,11 @@ Live-verified on codex-cli 0.163.0 (Linux, 2026-10-19; see VALIDATION.md): the a
 passes Codex's per-hook review UI and its commands, events and timeouts match the
 documented contract (SessionEnd/Interrupt timeout 1 s). Codex persists trust hash-pinned
 per hook definition in `~/.codex/config.toml` `[hooks.state]`; changed hooks require
-re-review. Two runtime caveats found: session lifecycle hooks are turn/session-bound
+re-review. Two runtime caveats found in the historical October 19 evidence: session lifecycle hooks are turn/session-bound
 (new threads alone do not fire them), and in this environment the shared background
-app-server daemon's PATH could not resolve a venv-local `pmp`, so hook execution needs
-`pmp` resolvable in the daemon's environment (no global install was performed to test
-this). Automatic checkpoint creation from real Codex hook events is still unverified;
+app-server daemon's PATH could not resolve a venv-local `pmp`. Newly generated
+hooks now use a pinned Python executable and explicit project path instead; that
+mitigation has automated subprocess testing, **not yet a real Codex hook-fired test**. Automatic checkpoint creation from real Codex hook events is still unverified;
 the weekly usage limit was at 1% and no model turn was run.
 
 `pmp adapter install claude --native` creates `.pmp-adapters/claude-settings.json` with
