@@ -26,7 +26,7 @@ def inspect(project):
             'state':project.state(),'git':source,'remote':remote_status(project.root),
             'checkpoint':latest,'shared_checkpoints':shared,'damaged_shared_checkpoints':shared_damaged,'damaged_checkpoints':damaged,'journal_events':len(events),'journal_tail':tail,
             'session':lease(project),'uncertainty':issues,'mutated_worktree':False,
-            'recovery_store':str(project.local), 'verification':summary(project)}
+            'recovery_store':str(project.local), 'verification':summary(project,source=source)}
 
 def handoff_data(project):
     state=project.state()
