@@ -12,6 +12,11 @@
   wrapper session lifecycle, checkpoints, shared handoff, fresh-clone recovery,
   independent-agent context recovery and native plugin snapshot capture.
 
+Next alpha increment (feature branch reviewed; merge still pending): `pmp adapters`, pre-init
+`pmp adapter inspect`, and `pmp brief` (source-aware, bounded, read-only context).
+Tests added to guard read-only behavior, output size and evidence invalidation.
+The PR #1 head (017972ea88fc) passed 6/6 GitHub CI jobs; this is not stable or native-agent runtime certification.
+
 These checkmarks cover implemented alpha work and local validation, not stable certification.
 Publication checkpoint is now on public GitHub under owner-approved MIT.
 Open gates: native runtime certification beyond OpenCode v2.0.32; cross-platform CI is fully green.

@@ -26,7 +26,7 @@ def inspect(project):
             'state':project.state(),'git':source,'remote':remote_status(project.root),
             'checkpoint':latest,'shared_checkpoints':shared,'damaged_shared_checkpoints':shared_damaged,'damaged_checkpoints':damaged,'journal_events':len(events),'journal_tail':tail,
             'session':lease(project),'uncertainty':issues,'mutated_worktree':False,
-            'recovery_store':str(project.local), 'verification':summary(project)}
+            'recovery_store':str(project.local), 'verification':summary(project,source=source)}
 
 def handoff_data(project):
     state=project.state()
@@ -48,6 +48,42 @@ def handoff_data(project):
                                   'Metadata checkpoints do not back up all dirty source contents.',
                                   'No automatic release, force push, cleanup, or lease takeover.'], 'timestamp':now()}
     return validate('handoff',value)
+
+def brief(project, *, limit=3):
+    """A read-only, bounded context summary. Never imply owner authorization."""
+    if not 1 <= limit <= 5:
+        raise PMPError('Brief item limit must be between 1 and 5')
+    # One reconciliation pass. Never create files, claim backups, or promote checks.
+    report=inspect(project)
+    state=report['state']
+    source=report['git']
+    def bounded(items):
+        return [str(x)[:240] for x in items[:limit]]
+    checks=report['verification']
+    applicable=[e for e in checks if e['applicable'] and e['credibility']=='verified' and e['outcome']=='passed']
+    latest=report['checkpoint']
+    categories=('completed','in_progress','blockers','next_actions')
+    return {
+        'schema_version':'1.0',
+        'read_only':True,
+        'project_id':project.project_id,
+        'worktree_id':project.worktree_id,
+        'git':{'head':source['head'],'branch':source['branch'],'clean':source['clean'],
+               'complete':source['complete'],'fingerprint':source['fingerprint']},
+        'task':{'id':state['task_id'],'approved_scope_ref':state['scope_ref'],
+                'phase':state['phase'],'status':state['status']},
+        'checkpoint':latest['checkpoint_id'] if latest else None,
+        'reported':{key:bounded(state[key]) for key in categories},
+        'counts':{'verification_records':len(checks),'applicable_verified_passes':len(applicable)},
+        'verification':[
+            {'check':e['check'],'tests_executed':e['tests_executed'],'evidence_id':e['evidence_id']}
+            for e in applicable[-limit:]],
+        'uncertainty':bounded(report['uncertainty']),
+        'truncated':any(len(state[k])>limit or any(len(str(x))>240 for x in state[k]) for k in categories)
+                    or len(applicable)>limit or len(report['uncertainty'])>limit,
+        'safety':'Context only: read AGENTS.md and the actual Git diff. Owner authorization and a source backup are never implied.'
+    }
+
 
 def render_handoff(value):
     lines=['# PMP handoff','',f"Task: {value['task_id'] or 'none'}",f"Approved scope: {value['approved_scope_ref'] or 'none'}",
