@@ -1,6 +1,12 @@
 # Agent adapters and compatibility
 
-All adapters use identical .pmp configuration, state, events, checkpoints and evidence.\n\nUse `pmp adapters` or `pmp adapter inspect codex` even before `pmp init`: both\nare read-only and report version-dependent native limitations. After initialization,\n`pmp brief --limit 3` produces a bounded, read-only context record for the next\nagent session. It is not automatically pasted into a model prompt and should be\nused selectively to avoid spending context tokens on redundant history.
+All adapters use identical .pmp configuration, state, events, checkpoints and evidence.
+
+Use `pmp adapters` or `pmp adapter inspect codex` even before `pmp init`: both
+are read-only and report version-dependent native limitations. After initialization,
+`pmp brief --limit 3` produces a bounded, read-only context record for the next
+agent session. It is not automatically pasted into a model prompt and should be
+used selectively to avoid spending context tokens on redundant history.
 Core works with no agent installed. Install bootstrap only:
 `pmp adapter install generic`. Read `.pmp-adapters/generic-BOOTSTRAP.md`.
 A human or a GitHub-reading chat agent can read the shared handoff without executing PMP;
