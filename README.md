@@ -66,6 +66,11 @@ A test result is applicable only to matching complete source; changed code can i
 | Claude Code | `pmp launch claude -- ...` | Experimental: live native hooks unverified |
 | OpenCode | `pmp launch opencode -- ...` | Experimental: native capture observed with v2.0.32 only |
 
+Codex and Claude native hook artifacts now use a pinned local Python interpreter
+and explicit Git worktree path instead of assuming the agent's background daemon
+has `pmp` on `PATH`. These files are machine-specific and must be reviewed and
+reinstalled after environment changes; they are **not yet live-model certified**.
+
 Use the wrapper when your installed agent version is not supported by a native adapter. Adapter installation does not bypass sandboxing or permission prompts. [Integration and version details](docs/ADAPTERS.md).
 
 ## Private by default
