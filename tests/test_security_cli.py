@@ -261,3 +261,54 @@ def test_watcher_crash_does_not_kill_agent(project):
         assert any('watcher.lock' in e for e in check(project)['errors'])
     finally:
         if p.poll() is None: p.kill(); p.wait()
+
+
+@pytest.mark.skipif(os.name=='nt',reason='Native hooks are intentionally disabled on Windows')
+def test_native_hook_commands_pin_interpreter_and_worktree(tmp_path,monkeypatch):
+    import shlex
+    from pmp.core.config import initialize
+    from pmp.adapters import native_hook_command
+    root=tmp_path/'project with spaces'; root.mkdir()
+    monkeypatch.setenv('PMP_STATE_HOME',str(tmp_path/'private'))
+    p,_=initialize(root)
+    for event in ('SessionStart','Stop','SessionEnd','Interrupt'):
+        args=shlex.split(native_hook_command(p,event))
+        assert args==[sys.executable,'-m','pmp','--project',str(p.root),'hook','--event',event]
+    # Invoking the generated command from outside the project must not infer cwd
+    # or depend on a globally available pmp executable.
+    env=os.environ.copy()
+    env.pop('PMP_SESSION_ID',None)
+    event='SessionStart'
+    result=subprocess.run(native_hook_command(p,event),shell=True,cwd=tmp_path,env=env,
+                          input=json.dumps({'hook_event_name':event}),text=True,
+                          capture_output=True,timeout=20)
+    assert result.returncode==0,result.stderr
+    assert 'additionalContext' in json.loads(result.stdout)['hookSpecificOutput']
+    assert not p.local.exists()
+
+
+@pytest.mark.skipif(os.name=='nt',reason='Native hooks are intentionally disabled on Windows')
+def test_codex_native_artifact_uses_explicit_project_and_no_bare_pmp(project,monkeypatch):
+    # Test the generation path without depending on a user's installed Codex.
+    monkeypatch.setattr(adapters,'inspect',lambda n:{'version':'codex-cli 0.163.0'})
+    result=adapters.install(project,'codex',native=True)
+    artifact=json.loads((project.root/'.codex/hooks.json').read_text())
+    for event in ('SessionStart','Stop','SessionEnd','Interrupt'):
+        command=artifact['hooks'][event][0]['hooks'][0]['command']
+        assert command.startswith("'") or command.startswith(sys.executable)
+        assert ' -m pmp --project ' in command
+        assert command.endswith(' hook --event '+event)
+        assert command!='pmp hook --event '+event
+    adapters.uninstall(project,'codex')
+    assert not (project.root/'.codex/hooks.json').exists()
+
+
+@pytest.mark.skipif(os.name=='nt',reason='Native hooks are intentionally disabled on Windows')
+def test_claude_native_hook_command_resolves_worktree(project):
+    result=adapters.install(project,'claude',native=True)
+    artifact=json.loads((project.root/result['files'][1]).read_text())
+    for event in ('SessionStart','Stop','SessionEnd'):
+        command=artifact['hooks'][event][0]['hooks'][0]['command']
+        assert ' -m pmp --project ' in command
+        assert command.endswith(' hook --event '+event)
+    adapters.uninstall(project,'claude')

@@ -1,6 +1,8 @@
 """Optional native lifecycle artifacts plus a universal subprocess wrapper."""
 import json
 import os
+import shlex
+import sys
 from pathlib import Path
 import shutil
 import subprocess
@@ -41,6 +43,19 @@ def inspect(name):
                            'No guarantee of hook execution on crashes',
                            'OpenCode native runtime certified only on v2.0.32; other versions unverified']}
 
+def native_hook_command(project, event):
+    """Machine-local command: pinned Python + explicit worktree, no daemon PATH dependency.
+
+    Native artifacts are *not* portable between machines. Review them and keep them
+    out of public commits; reinstall on each host after an interpreter move.
+    """
+    python=Path(sys.executable)
+    if not python.is_absolute() or not python.is_file() or not os.access(python,os.X_OK):
+        raise PMPError('Cannot locate an executable Python interpreter for native hooks; use the generic wrapper')
+    return (f'{shlex.quote(str(python))} -m pmp '
+            f'--project {shlex.quote(str(project.root))} hook --event {shlex.quote(event)}')
+
+
 def install(project,name,*,native=False):
     info=inspect(name)
     if project.config['adapters'][name]=='disabled': raise PMPError('Adapter disabled in project configuration')
@@ -51,12 +66,12 @@ def install(project,name,*,native=False):
             if info['version']!='codex-cli 0.163.0':
                 raise PMPError('Native Codex hooks gated to inspected CLI 0.163.0; use wrapper on other versions')
             artifacts['.codex/hooks.json']=json.dumps({'hooks':{
-                event:[{'hooks':[{'type':'command','command':f'pmp hook --event {event}'}]}]
+                event:[{'hooks':[{'type':'command','command':native_hook_command(project,event)}]}]
                 for event in ['SessionStart','Stop','SessionEnd','Interrupt']}},indent=2).encode()+b'\n'
         elif name=='claude':
             # Separate settings file: opt in with --settings; never merge user configuration.
             artifacts['.pmp-adapters/claude-settings.json']=json.dumps({'hooks':{
-                event:[{'hooks':[{'type':'command','command':f'pmp hook --event {event}','timeout':10}]}]
+                event:[{'hooks':[{'type':'command','command':native_hook_command(project,event),'timeout':10}]}]
                 for event in ['SessionStart','Stop','SessionEnd']}},indent=2).encode()+b'\n'
         elif name=='opencode':
             # Review artifact, not autoloaded. Shape verified against opencode v2.0.32:
@@ -107,7 +122,7 @@ export default {
         atomic_write(project.root/namepath,blob,exclusive=True)
         entries.append({'path':namepath,'hash':__import__('hashlib').sha256(blob).hexdigest()})
     write_json(manifest,entries,exclusive=True)
-    return dict(info,files=[e['path'] for e in entries],note='Native artifacts require trust/review; no global configuration changed.')
+    return dict(info,files=[e['path'] for e in entries],note='Machine-local native commands require review/trust and reinstall after Python moves; no global configuration changed.')
 
 def uninstall(project,name):
     if name not in NAMES: raise PMPError('Unsupported adapter')
