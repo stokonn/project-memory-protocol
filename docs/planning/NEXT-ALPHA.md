@@ -1,139 +1,84 @@
-# PMP next alpha — architecture review and staged upgrade plan
+# PMP next alpha — architecture review and merge plan
 
-**Status:** planning proposal for owner review, 2026-11-02. No implementation or release authorization is implied.  
-**Current baseline:** `main` advertises software version `1.0.0a1`, protocol/schema `1.0`.  
-**Suggested next software milestone:** `1.0.0a2` **only after explicit acceptance**; not PMP 1.0 Stable.
+**Status:** reviewed merge plan for owner approval, 2026-11-03. This document does not authorize a merge, version bump, tag, or release.  
+**Current baseline:** `main` is software `1.0.0a1`, protocol/schema `1.0`; PR #1 is squash-merged at `631c07280782e7e1`.  
+**Target proposal:** `1.0.0a2` only after ordered merges, post-merge CI, and separate owner authorization. Not PMP 1.0 Stable.
 
 ## Objective
 
-Make PMP more useful for real coding-agent handoffs without losing its local-first,
-non-destructive guarantees. Priority: accurate short context, deterministic worktree
-identity, correctly installed optional hooks, source-bound evidence, and honest
-recovery after interruption or agent switch.
+Improve real coding-agent handoffs while preserving PMP's local-first, non-destructive guarantees: bounded context, deterministic worktree identity, correctly installed optional hooks, private checkpoint recovery, and honest evidence.
 
-PMP is **not** an LLM or transcript storage service. Hand-offs do not grant
-permission. No automatic secrets, private source, command output or full transcripts
-may be published. No forced Git operations, automatic release, or silent migration.
+PMP is not an LLM or transcript-storage service. Handoffs do not grant permission. No automatic secrets, private source, command output or full transcripts may be published. No forced Git operations, automatic release, or silent migration.
 
-## Evidence baseline
+## Current GitHub state
 
-This review used the GitHub repository's `main` documentation/source and the
-three *open stacked PRs*, plus their actual GitHub Actions run statuses.
-No source checkout, local Python tests, native agent turns, production repository
-data, or real user PMP state were executed or modified for this review.
+| PR | Status | Base / dependency | Scope | Exact head | Exact-head CI |
+| --- | --- | --- | --- | --- | --- |
+| [#1](https://github.com/stokonn/project-memory-protocol/pull/1) | Merged | `main` | `pmp brief`, adapter discovery, synthetic output-size benchmark | merge `631c07280782e7e1` | Original corrected head passed 6/6 |
+| [#5](https://github.com/stokonn/project-memory-protocol/pull/5) | Open, draft | `main` | Codex/Claude native command pins interpreter and worktree | `1a1d8cfdbb9c0f61ebac7a98b52104a2473b5b2d` | run [41508763089](https://github.com/stokonn/project-memory-protocol/actions/runs/41508763089), 6/6 PASS |
+| [#6](https://github.com/stokonn/project-memory-protocol/pull/6) | Open, draft | PR #5 branch | Private state-home pinning, isolated Codex probe, recovery evidence | `6115764ba51072b30bcdec69ab8e0fdcb77963d3` | run [41627679097](https://github.com/stokonn/project-memory-protocol/actions/runs/41627679097), 6/6 PASS |
+| [#4](https://github.com/stokonn/project-memory-protocol/pull/4) | Open, draft | `main` | This planning document | update in progress | Docs-only |
 
-| Candidate | Dependency | Main scope | Head checked | GitHub Actions |
-| --- | --- | --- | --- | --- |
-| [PR #1](https://github.com/stokonn/project-memory-protocol/pull/1) | `main` | `pmp brief`, adapter discovery, synthetic output-size benchmark | `017972ea88fc` | [run 41255058393](https://github.com/stokonn/project-memory-protocol/actions/runs/41255058393), 6/6 PASS |
-| [PR #2](https://github.com/stokonn/project-memory-protocol/pull/2) | PR #1 | Native Codex/Claude commands pin Python and worktree | `aa2735cd3225` | [run 41256035868](https://github.com/stokonn/project-memory-protocol/actions/runs/41256035868), 6/6 PASS |
-| [PR #3](https://github.com/stokonn/project-memory-protocol/pull/3) | PR #2 | Explicit private state root, isolated Codex live probe and recovery evidence | `bcc6273cf53c` | [run 41258161780](https://github.com/stokonn/project-memory-protocol/actions/runs/41258161780), 6/6 PASS |
+The validation matrix is Ubuntu/macOS/Windows × Python 3.11/3.14. PR #5 and #6 exact heads have all six jobs completed successfully. Green CI proves the tested repository behavior only; it does **not** prove authenticated live Codex or Claude native hook delivery.
 
-The matrix is Ubuntu/macOS/Windows × Python 3.11/3.14.
-**CI passes do not prove vendor-native hook delivery in live authenticated sessions**.
-PR #3 also contains operator-reported Claude Code/Ollama *wrapper* recovery evidence;
-the report explicitly does not certify native hooks or token savings.
+PR #2 and #3 are historical stacked proposals. Their intended changes have clean successors in #5 and #6; do not merge the old stacked branches or close them until successor history is safely accepted.
 
-Current core structure: `src/pmp/core/`, `events/`, `checkpoints/`,
-`recovery/`, `verification/`, `github/`, `watcher/`, `adapters/`,
-`security/`, `cli/`. The normative contract remains `spec/1.0.md`.
+## Review findings
 
-## Findings requiring action
+### PR #5 — native command launcher
 
-1. **Observed documentation defect in PR #1:** `docs/ADAPTERS.md` and
-   `docs/IMPLEMENTATION.md` contain literal `\\n` characters embedded in
-   paragraphs where Markdown line breaks were intended. Correct in the originating
-   PR and verify that rendered Markdown is readable; avoid propagating the typo
-   through later stacked branches.
-2. **Current runtime-certification gap:** the exact Codex/Claude native hook
-   integration remains unproven by a real authenticated hook-fired model turn.
-   A generated artifact, manual receiver call, test fixture, or wrapper result
-   must not be represented as a vendor hook firing.
-3. **Machine-local artifact portability:** PRs #2–#3 deliberately pin the Python
-   executable, worktree and `PMP_STATE_HOME`. Verify behavior after moving a
-   checkout, recreating a virtual environment or starting an agent daemon with
-   a different environment. Fail visibly instead of silently writing to the wrong store.
-4. **Benchmark interpretation:** PR #1's demonstrated reduction is in CLI output
-   bytes, **not measured model tokens, credits, latency of agent responses or costs**.
-   Keep that distinction throughout README, releases and marketing text.
-5. **Protocol/recovery boundary:** `1.0` schema and local/private record identity
-   should stay unchanged for this milestone. No automatic migration, history rewrite
-   or transfer of private recovery stores.
+Reviewed all four changed files: README, adapter documentation, adapter implementation and security/CLI tests.
 
-## Execution checklist (owner approval required for implementation and merge)
+- Commands use the active Python interpreter, an explicit worktree path and POSIX shell quoting; they no longer assume the agent daemon can resolve a bare `pmp` on `PATH`.
+- Codex remains gated to the inspected `codex-cli 0.163.0`; existing artifacts are not overwritten and user/global agent settings are not edited.
+- Native installation is explicitly refused on Windows; wrapper launch remains the fallback. POSIX-only shell command generation is therefore not presented as cross-platform native support.
+- Tests cover paths with spaces, invocation from outside the project, artifact generation and uninstall preservation.
+- No blocking source-level finding identified in the reviewed diff. Real vendor hook delivery remains unverified.
 
-### Stage 0 — bounded review and acceptance criteria
+### PR #6 — state-home pinning and isolated recovery probe
 
-- [x] Inspect `main` architecture/specification, alpha status and open PR stack.
-- [x] Check exact PR head runs and all six jobs per PR.
-- [x] Identify PR #1 literal-newline documentation issue.
-- [ ] Review each PR's entire diff, regressions and test evidence together for
-      stacked dependencies; record any additional blocking finding with file/line.
-- [ ] Confirm that intended next milestone is alpha rather than Stable.
+Reviewed all nine changed files, including the inherited #5 changes, probe fixture, operator evidence and tests.
 
-### Stage 1 — compact context and adapter discovery (PR #1)
+- Native Codex/Claude command generation pins `PMP_STATE_HOME` as well as interpreter and project. The new subprocess test deliberately supplies a conflicting parent environment and checks that the checkpoint lands in the intended private store.
+- Probe setup creates a disposable synthetic Git project, refuses an existing output directory, does not launch an LLM, and does not touch Gould.
+- Probe inspection is designed as read-only and explicitly returns `live_vendor_hook_provenance_certified=false`; a hook-named checkpoint alone is not treated as proof of a real vendor event.
+- Claude Code/Ollama evidence is labeled operator-reported wrapper evidence, not independently captured native-hook evidence.
+- No blocking source-level finding identified in the reviewed diff. The native live-turn gate is still open.
 
-- [ ] Fix literal `\\n` in Markdown and align descriptions with CI evidence.
-- [ ] Review `pmp brief` for no unexpected source disclosure, correct current HEAD,
-      source-bound applicable evidence, explicit uncertainty and bounded output.
-- [ ] Check pre-init `pmp adapters` and `adapter inspect` are truly read-only,
-      including paths with spaces and disabled/missing vendor executables.
-- [ ] Review synthetic benchmark and keep byte-size numbers separate from token claims.
-- [ ] Owner review → merge PR #1 **only if** all mandatory checks pass.
+### Cross-cutting boundaries
 
-### Stage 2 — native hook path correctness (PR #2)
+1. PR #1's Markdown escaped-newline issue was corrected before its merge; avoid bringing old stacked branches back.
+2. Output-byte reductions are not measured model-token, credit, latency or cost reductions.
+3. Protocol/schema remains `1.0`; no migration, private-store transfer, forced Git operation, stable tag or release is included.
+4. CI has not exercised authenticated Codex/Claude sessions or the user's local Fedora environment.
 
-- [ ] Rebase/retarget the stacked PR onto the newly accepted `main`.
-- [ ] Test interpreter/worktree quoting, project selection, missing binary,
-      moved interpreter and daemon `PATH` divergence in disposable fixtures.
-- [ ] Keep existing vendor approval, trust and sandbox settings untouched.
-- [ ] Owner review → merge PR #2 only after fresh exact-head CI success.
+## Required merge order
 
-### Stage 3 — recovery-store pinning and live probe (PR #3)
+**Do not squash-merge #6 directly after #5 without rebuilding its branch.** PR #6 currently contains #5's changes in its ancestry. If #5 is squash-merged, merely retargeting #6 to `main` can make #5's changes appear again in #6's diff.
 
-- [ ] Rebase/retarget after PR #2; verify `PMP_STATE_HOME` selection independently
-      from current process directory and agent daemon environment.
-- [ ] Ensure `setup` refuses overwrites and `inspect` is read-only.
-- [ ] If the operator elects to run a genuine authenticated Codex turn, record
-      real vendor-event provenance, private checkpoint integrity, second-agent
-      recovery and clear failure cases. Do **not** fabricate success.
-- [ ] Preserve operator-reported Claude/Ollama wrapper evidence with its
-      reported/not-independently-captured label.
-- [ ] Owner review → merge PR #3 only after checks appropriate to its scope.
+1. **Owner reviews and authorizes PR #5.** It is an independent change set against current `main`. Keep it draft until that approval.
+2. **Merge #5 using the owner's selected merge strategy.** Then verify the resulting `main` SHA and run all six required CI jobs on the post-merge commit.
+3. **Create a clean successor branch for #6 from the new `main`.** Port only #6's incremental changes: probe documentation, probe script/tests, operator evidence, state-home pinning, and its corresponding tests/docs. Do not copy #5's already-merged hunks or preserve the old stacked ancestry.
+4. **Open a replacement PR for that clean #6 successor.** Compare its diff against `main`; it must contain only the incremental #6 scope. Run exact-head 6/6 CI. Keep the existing #6 draft as historical until the successor is reviewed; close it only after confirming no unique work was lost.
+5. **After both changes are on `main`, run integration and backward-compatibility gates** on that exact combined commit.
+6. **Only then present the alpha decision.** A version bump to `1.0.0a2` and any pre-release/tag require separate explicit owner authorization.
 
-### Stage 4 — integration and backwards-compatibility gate
+PR #4 is a planning artifact and is not a prerequisite for merging code. It should remain draft until the owner accepts the plan.
 
-- [ ] On the resulting `main` commit, run the full 6-job CI matrix; ensure
-      package builds and disposable demos pass.
-- [ ] Exercise a fresh project and an **existing alpha project copy**, including
-      interrupted writes, damaged journal tail, shared handoff, source-change
-      invalidation and private checkpoint preservation.
-- [ ] Check security: no secret publication, untrusted text never becomes approval,
-      no forced Git operations and no auto-reset of locks or private state.
-- [ ] Record exact source SHA, executed checks, counts, environment, limitations.
-- [ ] Update README, CLI, adapter and readiness docs with accurate supported
-      versions; avoid claims not backed by live evidence.
+## Integration gates after code merges
 
-### Stage 5 — milestone decision
+- Run the full 6-job CI matrix on the exact combined `main` commit; verify package build and disposable examples.
+- Exercise a fresh project and a copy of an existing alpha project: interrupted writes, damaged journal tail, shared handoff, source-change invalidation and private checkpoint preservation.
+- Verify no secrets are published, untrusted text never becomes approval, no forced Git operations occur, and locks/private state are never silently reset.
+- On the user's Fedora machine, separately test native hook delivery only with an already-authenticated, user-initiated Codex/Claude session and explicit trust review. No agent account changes, approval bypasses or production-project tests.
+- Record exact source SHA, executed checks, counts, environment and limitations. Do not claim live hook certification from CI or a manually invoked receiver.
 
-- [ ] Present evidence and remaining gaps to owner.
-- [ ] Only with separate authorization, bump software version to the agreed
-      next **alpha** and consider a pre-release.
-- [ ] No stable release/tag, migration, real Gould integration, agent-account
-      changes or public checkpoint upload by default.
+## Milestone decision
 
-## Acceptance definition
-
-The upgrade is acceptable when the feature stack is merged in order with passing
-post-merge CI, the documentation renders properly, read-only operations do not
-mutate projects, private state is never mislocated or published silently, and every
-integration claim is scoped to actually observed evidence. Unverified native
-vendor events stay clearly labeled experimental.
+The proposed next milestone remains **alpha 1.0.0a2**, not Stable. Acceptance requires ordered clean merges, post-merge CI, correct documentation, no private-state misrouting, and evidence claims limited to what was actually observed. Native vendor events remain experimental until independently observed in a genuine authenticated model turn.
 
 ## Working rules
 
-Review → bounded proposal → owner approval → implementation → test with exact
-source identity → PR review → merge. Preserve original history and avoid touching
-Gould or any user's existing PMP private checkpoints while testing. Never declare
-a stage complete from an older unrelated CI run.
+Review → bounded proposal → owner approval → implementation → exact-source validation → PR review → merge. Preserve original history. Do not touch Gould or any existing user PMP private checkpoint while testing. No automatic release or migration.
 
 created by stokonn with love <3
