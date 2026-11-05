@@ -84,6 +84,8 @@ Use the wrapper when your installed agent version is not supported by a native a
 
 Read [security limitations](docs/SECURITY.md), [recovery guidance](docs/RECOVERY.md) and [the normative protocol](spec/1.0.md).
 
+Operator and maintainer guides: [security boundaries](docs/operations/SECURITY-BOUNDARIES.md) · [recovery runbook](docs/operations/RECOVERY-RUNBOOK.md) · [validation/evidence matrix](docs/testing/VALIDATION-MATRIX.md) · [alpha release gates](docs/planning/ALPHA-RELEASE-GATES.md).
+
 ## Development status
 
 PMP is an independently usable alpha, with a disposable end-to-end Git demonstration and prior local/cross-platform test evidence. The **latest development branch changes require their own CI acceptance**; prior passes are not automatically evidence for new code. Stable publication remains blocked on wider live adapter verification and release readiness.
