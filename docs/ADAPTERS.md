@@ -33,7 +33,8 @@ against authenticated live sessions.
 Future API/schema/version changes require reinspection; wrappers remain the fallback.
 
 **Machine-local native command paths:** Codex and Claude hook artifacts now pin the
-interpreter running PMP (`sys.executable`) and the exact Git worktree (`--project`).
+interpreter running PMP (`sys.executable`), exact Git worktree (`--project`) and
+resolved private state root (`PMP_STATE_HOME`).
 This avoids relying on the vendor daemon's `PATH` or launch working directory.
 Generated hook commands use shell-quoted POSIX paths and are intended for the
 specific machine where they were created; after a Python environment or workspace
@@ -41,7 +42,9 @@ move, uninstall and reinstall reviewed artifacts. **Do not commit machine-specif
 native hook commands to a public repository.** Installation never overwrites an
 existing hook artifact or edits global agent settings. This improves invocation
 reliability but does not certify a live model-turn hook, and background daemon
-permissions and timeouts still require runtime testing.
+permissions and timeouts still require runtime testing. The state-home pin is covered by
+a subprocess test that supplies a conflicting parent environment and verifies the
+checkpoint lands in the intended private store; it is not a genuine vendor-session test.
 
 `pmp adapter install codex --native` creates `.codex/hooks.json` only if absent and gates
 to inspected `codex-cli 0.163.0`. Review/trust through Codex `/hooks`; PMP never bypasses

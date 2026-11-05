@@ -273,7 +273,7 @@ def test_native_hook_commands_pin_interpreter_and_worktree(tmp_path,monkeypatch)
     p,_=initialize(root)
     for event in ('SessionStart','Stop','SessionEnd','Interrupt'):
         args=shlex.split(native_hook_command(p,event))
-        assert args==[sys.executable,'-m','pmp','--project',str(p.root),'hook','--event',event]
+        assert args==['PMP_STATE_HOME='+str((tmp_path/'private').resolve()),sys.executable,'-m','pmp','--project',str(p.root),'hook','--event',event]
     # Invoking the generated command from outside the project must not infer cwd
     # or depend on a globally available pmp executable.
     env=os.environ.copy()
@@ -290,12 +290,15 @@ def test_native_hook_commands_pin_interpreter_and_worktree(tmp_path,monkeypatch)
 @pytest.mark.skipif(os.name=='nt',reason='Native hooks are intentionally disabled on Windows')
 def test_codex_native_artifact_uses_explicit_project_and_no_bare_pmp(project,monkeypatch):
     # Test the generation path without depending on a user's installed Codex.
+    import shlex
     monkeypatch.setattr(adapters,'inspect',lambda n:{'version':'codex-cli 0.163.0'})
     result=adapters.install(project,'codex',native=True)
     artifact=json.loads((project.root/'.codex/hooks.json').read_text())
     for event in ('SessionStart','Stop','SessionEnd','Interrupt'):
         command=artifact['hooks'][event][0]['hooks'][0]['command']
-        assert command.startswith("'") or command.startswith(sys.executable)
+        assert command.startswith('PMP_STATE_HOME=')
+        tokens=shlex.split(command)
+        assert tokens[1:4]==[sys.executable,'-m','pmp']
         assert ' -m pmp --project ' in command
         assert command.endswith(' hook --event '+event)
         assert command!='pmp hook --event '+event
@@ -312,3 +315,28 @@ def test_claude_native_hook_command_resolves_worktree(project):
         assert ' -m pmp --project ' in command
         assert command.endswith(' hook --event '+event)
     adapters.uninstall(project,'claude')
+
+
+@pytest.mark.skipif(os.name=='nt',reason='Native hooks are intentionally disabled on Windows')
+def test_native_hook_commands_pin_interpreter_worktree_and_state_home(tmp_path,monkeypatch):
+    import shlex
+    from pmp.core.config import initialize
+    from pmp.adapters import native_hook_command
+    root=tmp_path/'project with spaces'; root.mkdir()
+    intended=tmp_path/'private state'
+    monkeypatch.setenv('PMP_STATE_HOME',str(intended))
+    project,_=initialize(root)
+    for event in ('SessionStart','Stop','SessionEnd','Interrupt'):
+        args=shlex.split(native_hook_command(project,event))
+        assert args==['PMP_STATE_HOME='+str(intended.resolve()),sys.executable,'-m','pmp',
+                      '--project',str(project.root),'hook','--event',event]
+    env=os.environ.copy()
+    env.pop('PMP_SESSION_ID',None)
+    env['PMP_STATE_HOME']=str(tmp_path/'wrong private state')
+    result=subprocess.run(native_hook_command(project,'Stop'),shell=True,cwd=tmp_path,env=env,
+                          input=json.dumps({'hook_event_name':'Stop'}),text=True,
+                          capture_output=True,timeout=20)
+    assert result.returncode==0,result.stderr
+    assert project.local.is_dir()
+    assert list((project.local/'checkpoints').glob('*.json'))
+    assert not (tmp_path/'wrong private state').exists()

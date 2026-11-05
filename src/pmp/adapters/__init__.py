@@ -52,7 +52,11 @@ def native_hook_command(project, event):
     python=Path(sys.executable)
     if not python.is_absolute() or not python.is_file() or not os.access(python,os.X_OK):
         raise PMPError('Cannot locate an executable Python interpreter for native hooks; use the generic wrapper')
-    return (f'{shlex.quote(str(python))} -m pmp '
+    # Pin the private store too: agent daemons may inherit a different state-home.
+    from pmp.core.config import private_base
+    state=private_base().resolve()
+    return (f'PMP_STATE_HOME={shlex.quote(str(state))} '
+            f'{shlex.quote(str(python))} -m pmp '
             f'--project {shlex.quote(str(project.root))} hook --event {shlex.quote(event)}')
 
 
