@@ -290,6 +290,7 @@ def test_native_hook_commands_pin_interpreter_and_worktree(tmp_path,monkeypatch)
 @pytest.mark.skipif(os.name=='nt',reason='Native hooks are intentionally disabled on Windows')
 def test_codex_native_artifact_uses_explicit_project_and_no_bare_pmp(project,monkeypatch):
     # Test the generation path without depending on a user's installed Codex.
+    import shlex
     monkeypatch.setattr(adapters,'inspect',lambda n:{'version':'codex-cli 0.163.0'})
     result=adapters.install(project,'codex',native=True)
     artifact=json.loads((project.root/'.codex/hooks.json').read_text())
