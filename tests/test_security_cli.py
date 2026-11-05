@@ -312,3 +312,28 @@ def test_claude_native_hook_command_resolves_worktree(project):
         assert ' -m pmp --project ' in command
         assert command.endswith(' hook --event '+event)
     adapters.uninstall(project,'claude')
+
+
+@pytest.mark.skipif(os.name=='nt',reason='Native hooks are intentionally disabled on Windows')
+def test_native_hook_commands_pin_interpreter_worktree_and_state_home(tmp_path,monkeypatch):
+    import shlex
+    from pmp.core.config import initialize
+    from pmp.adapters import native_hook_command
+    root=tmp_path/'project with spaces'; root.mkdir()
+    intended=tmp_path/'private state'
+    monkeypatch.setenv('PMP_STATE_HOME',str(intended))
+    project,_=initialize(root)
+    for event in ('SessionStart','Stop','SessionEnd','Interrupt'):
+        args=shlex.split(native_hook_command(project,event))
+        assert args==['PMP_STATE_HOME='+str(intended.resolve()),sys.executable,'-m','pmp',
+                      '--project',str(project.root),'hook','--event',event]
+    env=os.environ.copy()
+    env.pop('PMP_SESSION_ID',None)
+    env['PMP_STATE_HOME']=str(tmp_path/'wrong private state')
+    result=subprocess.run(native_hook_command(project,'Stop'),shell=True,cwd=tmp_path,env=env,
+                          input=json.dumps({'hook_event_name':'Stop'}),text=True,
+                          capture_output=True,timeout=20)
+    assert result.returncode==0,result.stderr
+    assert project.local.is_dir()
+    assert list((project.local/'checkpoints').glob('*.json'))
+    assert not (tmp_path/'wrong private state').exists()
