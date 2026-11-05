@@ -4,7 +4,7 @@
 
 PMP's October 19, 2026 native Codex 0.163.0 trust-flow inspection observed that
 the background app-server daemon could not resolve a virtualenv-local bare `pmp`
-command. PR #2 pins the Python executable and Git worktree. This milestone also
+command. The merged PR #5 pins the Python executable and Git worktree. This successor also
 pins the private PMP state directory so the daemon cannot silently use a
 different recovery store. These are necessary correctness fixes, **not proof
 that Codex executes hooks on a real turn**.
