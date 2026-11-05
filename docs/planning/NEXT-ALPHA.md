@@ -1,6 +1,6 @@
 # PMP next alpha — architecture review and merge plan
 
-**Status:** reviewed merge plan for owner approval, 2026-11-03. This document does not authorize a merge, version bump, tag, or release.  
+**Status:** refreshed repository plan for owner review, 2026-11-05. This document does not authorize a merge, version bump, tag, or release.  
 **Current baseline:** `main` is software `1.0.0a1`, protocol/schema `1.0`; PR #1 is squash-merged at `631c07280782e7e1` and PR #5 at `88782d5fbb456d5c`.  
 **Target proposal:** `1.0.0a2` only after ordered merges, post-merge CI, and separate owner authorization. Not PMP 1.0 Stable.
 
@@ -16,12 +16,12 @@ PMP is not an LLM or transcript-storage service. Handoffs do not grant permissio
 | --- | --- | --- | --- | --- | --- |
 | [#1](https://github.com/stokonn/project-memory-protocol/pull/1) | Merged | `main` | `pmp brief`, adapter discovery, synthetic output-size benchmark | merge `631c07280782e7e1` | Original corrected head passed 6/6 |
 | [#5](https://github.com/stokonn/project-memory-protocol/pull/5) | Merged | `main` | Codex/Claude native command pins interpreter and worktree | merge `88782d5fbb456d5c` | exact-head run [41508763089](https://github.com/stokonn/project-memory-protocol/actions/runs/41508763089), 6/6 PASS |
-| [#6](https://github.com/stokonn/project-memory-protocol/pull/6) | Open, draft; clean successor required | stacked branch (historical) | Private state-home pinning, isolated Codex probe, recovery evidence | `6115764ba51072b30bcdec69ab8e0fdcb77963d3` | historical run [41627679097](https://github.com/stokonn/project-memory-protocol/actions/runs/41627679097), 6/6 PASS; not evidence for a clean successor |
-| [#4](https://github.com/stokonn/project-memory-protocol/pull/4) | Clean successor proposed | `main` | This planning document | new clean branch | Docs-only; exact-head CI required |
+| [#6](https://github.com/stokonn/project-memory-protocol/pull/6) | Open, draft; historical stack | stacked branch (historical) | Original private state-home pinning, isolated Codex probe, recovery evidence | `6115764ba51072b30bcdec69ab8e0fdcb77963d3` | historical run [41627679097](https://github.com/stokonn/project-memory-protocol/actions/runs/41627679097), 6/6 PASS; superseded by clean successor #10 |
+| [#7](https://github.com/stokonn/project-memory-protocol/pull/7) | Open | `main` | This planning document | `112555682f6af77cad5041a0f5d01538b469d719` | exact-head run [41629805465](https://github.com/stokonn/project-memory-protocol/actions/runs/41629805465), 6/6 PASS |
 
-The validation matrix is Ubuntu/macOS/Windows × Python 3.11/3.14. PR #5's exact head passed all six jobs before merge. PR #6's historical stacked head passed all six jobs; a clean successor still requires its own exact-head CI. Green CI proves the tested repository behavior only; it does **not** prove authenticated live Codex or Claude native hook delivery.
+The validation matrix is Ubuntu/macOS/Windows × Python 3.11/3.14. PR #5's exact head passed all six jobs before merge. The original stacked PR #6 and clean successor PR #10 each have their own 6/6 exact-head CI evidence. Green CI proves the tested repository behavior only; it does **not** prove authenticated live Codex or Claude native hook delivery. PR #9 adds four operator guides in four separate commits; its fifth commit links them from README and its updated exact-head CI is pending.
 
-PR #2 and #3 are historical stacked proposals. PR #5 is now merged. PR #6 must be rebuilt from current `main` with only its incremental changes; do not merge its current stacked history.
+PR #2 and #3 are historical stacked proposals. PR #5 is now merged. PR #6's incremental work has been rebuilt as clean successor PR #10 directly from current `main`; do not merge the old stacked PR #6.
 
 ## Review findings
 
@@ -57,8 +57,8 @@ Reviewed all nine changed files, including the inherited #5 changes, probe fixtu
 **PR #5 is now squash-merged** at `88782d5fbb456d5c`. Its exact-head CI passed 6/6 before merge.
 
 1. Verify post-merge `main` and its checks.
-2. **Create a clean successor branch for #6 from current `main`.** Port only #6's incremental changes: probe documentation, probe script/tests, operator evidence, state-home pinning, and corresponding tests/docs. Do not copy #5's already-merged hunks or preserve old stacked ancestry.
-3. Open a replacement PR for that clean #6 successor. Its diff against `main` must contain only incremental #6 scope. Run exact-head 6/6 CI. Keep existing #6 draft as historical until the successor is reviewed; close it only after confirming no unique work was lost.
+2. **Review clean successor PR #10.** Its diff against `main` contains only incremental #6 scope: probe documentation/script/tests, operator evidence, private-state pinning, and corresponding docs/tests. It does not copy #5's already-merged hunks or preserve old stacked ancestry. Its exact-head CI is the required gate before review/merge.
+3. Keep original PR #6 draft as historical until PR #10 is reviewed and accepted; close #6 only after confirming no unique work was lost.
 4. After both changes are on `main`, run integration and backward-compatibility gates on that exact combined commit.
 5. Only then present the alpha decision. A version bump to `1.0.0a2` and any pre-release/tag require separate explicit owner authorization.
 
