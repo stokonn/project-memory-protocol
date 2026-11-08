@@ -25,11 +25,14 @@ Official references inspected 2026-10-19:
 - [OpenCode plugins](https://docs.opencode.ai/docs/plugins/): plugin lifecycle and event subscription, including session.idle. The public docs page (inspected 2026-10-19) still shows a named-export shape that installed v2.0.32 rejects; the binary requires a default export. The v2.0.32-verified shape is what PMP ships.
 
 Native artifacts are **experimental**. Contract-shaped payloads and preservation
-behavior are tested for all adapters; the OpenCode artifact additionally has a live
-runtime verification on v2.0.32 (wrapper + native snapshot capture, see VALIDATION.md).
-The Codex artifact has a live trust-flow verification on codex-cli 0.163.0 (review,
-trust, persistence) but no verified hook-fired checkpoint; Claude hooks remain untested
-against authenticated live sessions.
+behavior are tested for all adapters. `pmp adapter inspect NAME` reports a
+machine-readable `native_runtime_status` (`not_applicable`, `partial`,
+`unverified` or `verified_limited`) and a plain-language evidence boundary.
+The OpenCode artifact has live native snapshot-capture verification on v2.0.32 only
+(wrapper + native capture, see VALIDATION.md). Codex 0.163.0 has partial trust/review
+flow evidence, but no authenticated model-turn hook-fired checkpoint. Claude native
+hooks have not been tested in an authenticated live session. A green status for one
+adapter or version must not be generalized to another.
 Future API/schema/version changes require reinspection; wrappers remain the fallback.
 
 **Machine-local native command paths:** Codex and Claude hook artifacts now pin the
