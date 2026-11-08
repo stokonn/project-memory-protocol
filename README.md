@@ -84,7 +84,7 @@ Use the wrapper when your installed agent version is not supported by a native a
 
 Read [security limitations](docs/SECURITY.md), [recovery guidance](docs/RECOVERY.md) and [the normative protocol](spec/1.0.md).
 
-Operator and maintainer guides: [security boundaries](docs/operations/SECURITY-BOUNDARIES.md) · [recovery runbook](docs/operations/RECOVERY-RUNBOOK.md) · [validation/evidence matrix](docs/testing/VALIDATION-MATRIX.md) · [alpha release gates](docs/planning/ALPHA-RELEASE-GATES.md).
+Operator and maintainer guides: [security boundaries](docs/operations/SECURITY-BOUNDARIES.md) · [native-hook threat model](docs/security/NATIVE-HOOK-THREAT-MODEL.md) · [recovery runbook](docs/operations/RECOVERY-RUNBOOK.md) · [recovery fault matrix](docs/testing/RECOVERY-FAULT-MATRIX.md) · [local validation](docs/operations/LOCAL-VALIDATION.md) · [validation/evidence matrix](docs/testing/VALIDATION-MATRIX.md) · [release evidence template](docs/operations/RELEASE-EVIDENCE-TEMPLATE.md) · [alpha release gates](docs/planning/ALPHA-RELEASE-GATES.md) · [next alpha plan](docs/planning/NEXT-ALPHA.md).
 
 ## Development status
 
