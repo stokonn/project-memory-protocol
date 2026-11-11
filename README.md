@@ -4,7 +4,7 @@
 
 PMP is a **local-first, agent-agnostic development-memory CLI** for Git projects. It records source-bound verification, immutable metadata checkpoints and portable handoffs without replacing your project's instructions or requiring an AI service.
 
-**Development alpha `1.0.0a1` — not a certified stable release.** Python 3.11+, MIT license. No model API, account, always-on daemon or default network request required.
+**Development alpha `1.0.0a1` — not a certified stable release.** Python 3.11+, MIT license. The cross-platform CI matrix covers Python 3.11, 3.14 and 3.15 on Ubuntu, macOS and Windows. No model API, account, always-on daemon or default network request required.
 
 ## Why PMP?
 
