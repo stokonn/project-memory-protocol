@@ -109,7 +109,7 @@ bytes and wall-clock time for `pmp status` versus `pmp brief`. It **does not** m
 billed tokens, real Codex credits or real-agent productivity; see
 [benchmark methodology](docs/BENCHMARK.md).
 
-The demo uses a **disposable synthetic fixture**, never the owner's real Gould source or data.
+The demo uses a *disposable synthetic fixture*, never the owner's real Gould source or data.
 
 ---
 
