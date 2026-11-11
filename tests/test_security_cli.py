@@ -68,6 +68,22 @@ def test_single_agent_inspection_without_init(tmp_path,capsys):
     assert not (root/'.pmp.yml').exists()
 
 
+@pytest.mark.parametrize(('name','status','capture_verified'),[
+    ('generic','not_applicable',False),
+    ('codex','partial',False),
+    ('claude','unverified',False),
+    ('opencode','verified_limited',True),
+])
+def test_adapter_inspection_reports_scoped_native_evidence(name,status,capture_verified,monkeypatch):
+    monkeypatch.setattr(adapters.shutil,'which',lambda _name:None)
+    info=adapters.inspect(name)
+    assert info['native_runtime_status']==status
+    assert info['native_hook_capture_verified'] is capture_verified
+    assert isinstance(info['native_runtime_evidence'],str) and info['native_runtime_evidence']
+    assert info['native_runtime_tested'] is capture_verified
+    assert ('v2.0.32' in info['native_runtime_evidence']) is capture_verified
+
+
 def test_unsupported_adapter(project):
     with pytest.raises(PMPError,match='Unsupported'): adapters.inspect('made-up')
 

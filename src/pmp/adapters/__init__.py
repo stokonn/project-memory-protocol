@@ -32,16 +32,37 @@ def inspect(name):
             r=subprocess.run([binary,'--version'],capture_output=True,timeout=5)
             if r.returncode==0: version=r.stdout.decode(errors='replace').strip()[:100]
         except (OSError,subprocess.TimeoutExpired): pass
+    runtime_status={
+        'generic':'not_applicable',
+        'codex':'partial',
+        'claude':'unverified',
+        'opencode':'verified_limited',
+    }[name]
+    runtime_evidence={
+        'generic':'Generic process wrapper only; no native hook integration.',
+        'codex':'Codex CLI 0.163.0 trust/review flow was exercised, but no authenticated model-turn hook-fired checkpoint has been verified.',
+        'claude':'No authenticated Claude Code native-hook session has been tested.',
+        'opencode':'Native snapshot capture was verified on OpenCode v2.0.32 only; other versions and modes are unverified.',
+    }[name]
+    limitations=['No transcript ingestion','No implicit approvals','No guarantee of hook execution on crashes']
+    if name=='generic':
+        limitations.append('No native hook integration; use the universal process wrapper')
+    elif name=='codex':
+        limitations.append('Trust/review flow only: automatic native hook checkpoint capture remains unverified')
+    elif name=='claude':
+        limitations.append('Authenticated native hook delivery has not been tested')
+    else:
+        limitations.append('Native runtime verified only on OpenCode v2.0.32; other versions and modes are unverified')
     return {'adapter':name,'binary_available':bool(binary),'version':version,'wrapper':True,
             'native_interface_documented':name!='generic',
             'native_runtime_tested':name=='opencode',
+            'native_runtime_status':runtime_status,
+            'native_runtime_evidence':runtime_evidence,
+            'native_hook_capture_verified':name=='opencode',
             'native_runtime_verified_versions':{'opencode':'v2.0.32'}.get(name),
             'native_support':'experimental artifacts; review before enabling',
             'capabilities':['launch','independent-session-snapshot','independent-session-watcher','local-checkpoint','handoff'],
-            'limitations':['No transcript ingestion',
-                           'No implicit approvals',
-                           'No guarantee of hook execution on crashes',
-                           'OpenCode native runtime certified only on v2.0.32; other versions unverified']}
+            'limitations':limitations}
 
 def native_hook_command(project, event):
     """Machine-local command: pinned Python + explicit worktree, no daemon PATH dependency.
